@@ -1,5 +1,11 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1B1C1E"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><!-- HW:META 테스트용 — 운영(index.html) 배포 때 이 블록을 운영용으로 바꿔요 -->
+<meta name="apple-mobile-web-app-title" content="hardwrk">
 <title>hardwrk</title>
+<meta name="description" content="운동 기록과 증량 관리를 한곳에서. 지난 기록을 보고 오늘 할 운동과 목표 무게를 알려줘요.">
+<meta property="og:title" content="hardwrk">
+<meta property="og:description" content="운동 기록과 증량 관리를 한곳에서. 지난 기록을 보고 오늘 할 운동과 목표 무게를 알려줘요.">
+<!-- /HW:META --><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: phone-first single column, max 520px. 기록 = 아침 체중 → 현황 3지표 → AI 요약 → 근력/체성분/러닝 드릴다운. 식단 = 지금 먹을 것 → 하루 목표 → 흐름 → 규칙(접힘). Fixed full-width CTA above the tab bar. Light only. */
@@ -1629,6 +1635,11 @@ details[open] .co-chev{transform:rotate(180deg)}
 .cx{align-items:center}
 .cx-g{margin-left:auto;max-width:48%;min-width:0}
 .cx-g span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* v97: 메모 없는 종목은 세트 줄 생략 */
+/* v96: C안 세트 줄 */
+/* v95: 종목 카드 버튼 라벨 간소화 — 슈퍼세트→슈퍼, 드롭세트→드롭(읽어주기는 전체 이름) */
+/* v94: 메모가 길어 다음 줄로 넘어가면 오른쪽에 혼자 떠 있던 문제 — 다른 버튼처럼 왼쪽부터 이어 붙이고, 줄 폭을 넘으면 말줄임 */
+.cx-g{margin-left:0;max-width:100%}
 .cx-g svg{flex:none}
 .cx-g.on{border-color:transparent;background:var(--fill-2);color:var(--ink)}
 .gm{display:flex;flex-direction:column;gap:12px}
@@ -1644,6 +1655,25 @@ details[open] .co-chev{transform:rotate(180deg)}
 
 /* v74 종목 바꾸기 */
 .cx-b.sw-on{border-color:var(--amber);color:var(--amber)}
+/* v96: 세트 줄 — 세트 수 · 기구 메모 + 종목 바꾸기(오른쪽 끝). 글자 버튼이라도 누르는 높이 32px */
+.cx-sr{display:flex;align-items:center;gap:8px;min-height:32px;margin:0}
+.card-top+.cx-sr{margin-top:-16px}
+.cx-sr+.cx{margin-top:-10px}
+.cx-meta{flex:1;min-width:0;display:flex;align-items:center;gap:4px;font-size:13px;line-height:18px;color:var(--ink-3);white-space:nowrap}
+.cx-sub{flex:0 0 auto;max-width:62%;overflow:hidden;text-overflow:ellipsis}
+.cx-dot{font-style:normal;flex:none}
+.cx-m,.cx-s{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0;border:0;background:none;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cx-m{min-width:0;flex:0 100 auto;color:var(--ink-2)}
+.cx-m span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cx-m.em{color:var(--ink-4)}
+.cx-m svg,.cx-s svg{flex:none}
+.cx-s{flex:none;color:var(--ink-3);padding-left:0}
+.cx-s::before{content:"";width:1px;height:16px;background:var(--line);margin-right:10px;flex:none}
+.cx-meta:empty+.cx-s::before,.cx-s-in::before{display:none}
+.cx-s-in{margin-left:auto}
+.card-top+.cx{margin-top:-6px}
+.cx-s.am{color:var(--amber)}
+.cx-m:active,.cx-s:active{opacity:.6}
 .swb{display:flex;flex-direction:column;gap:10px}
 .sw-c{margin:0;font-size:14px;line-height:20px;color:var(--ink-3);word-break:keep-all}
 .sw-h{margin:6px 0 0;font-size:12.5px;line-height:16px;font-weight:700;color:var(--ink-3)}
@@ -1664,8 +1694,8 @@ details[open] .co-chev{transform:rotate(180deg)}
 .cel{position:fixed;inset:0;z-index:58;background:#1B1C1E;overflow-y:auto;overscroll-behavior:contain}
 .cel[hidden]{display:none}
 .cel-on{overflow:hidden}
-.cel-box{position:relative;max-width:520px;min-height:100%;margin:0 auto;display:flex;flex-direction:column;color:var(--ink);font-family:var(--font);letter-spacing:-.01em;padding-bottom:env(safe-area-inset-bottom,0px)}
-.cel-fw{position:absolute;left:50%;top:0;width:390px;height:320px;transform:translateX(-50%);pointer-events:none}
+.cel-box{position:relative;max-width:520px;min-height:100%;margin:0 auto;display:flex;flex-direction:column;color:var(--ink);font-family:var(--font);letter-spacing:-.01em}
+.cel-fw{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) - 112px);width:390px;height:320px;transform:translateX(-50%);pointer-events:none}
 .cel .fw{position:absolute;width:0;height:0}
 .cel .fw i{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;opacity:0;animation:celFw 1.5s cubic-bezier(.15,.7,.3,1) 1 both;animation-delay:inherit}
 .cel .fw b{position:absolute;left:-8px;top:-8px;width:16px;height:16px;border-radius:50%;background:#fff;opacity:0;animation:celCore 1.5s ease-out 1 both;animation-delay:inherit}
@@ -1676,9 +1706,9 @@ details[open] .co-chev{transform:rotate(180deg)}
 .cel .pop{animation:celPop .6s cubic-bezier(.34,1.56,.64,1) .2s both}
 .cel .r1{animation:celRise .5s ease-out .5s both}.cel .r2{animation:celRise .5s ease-out .65s both}.cel .r3{animation:celRise .5s ease-out .8s both}
 @media (prefers-reduced-motion:reduce){.cel-fw{display:none}.cel .pop,.cel .r1,.cel .r2,.cel .r3{animation:none}}
-.cel-top{display:flex;justify-content:flex-end;padding:calc(12px + env(safe-area-inset-top,0px)) 12px 0;position:relative}
+.cel-top{display:flex;justify-content:flex-end;padding:calc(8px + env(safe-area-inset-top,0px)) 8px 0;position:absolute;top:0;right:0;z-index:2}
 .cel-x{width:44px;height:44px;border:0;background:transparent;color:var(--ink-2);display:grid;place-items:center;padding:0;cursor:pointer}
-.cel-m{flex:1;display:flex;flex-direction:column;gap:24px;padding:96px 20px 0;position:relative}
+.cel-m{flex:1;display:flex;flex-direction:column;gap:20px;padding:calc(28px + env(safe-area-inset-top,0px)) 20px 0;position:relative}
 .cel-hero{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
 .cel-ok{width:64px;height:64px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;box-shadow:0 0 0 8px rgba(0,191,64,.16)}
 .cel-ok svg{width:32px;height:32px}
@@ -1704,7 +1734,7 @@ details[open] .co-chev{transform:rotate(180deg)}
 .cel-bar span.on{background:#3D7CFD}.cel-bar span.on.g{background:var(--green)}
 .cel-wk p{margin:0;font-size:13px;line-height:19px;color:var(--ink-2);word-break:keep-all}
 .cel-wk p b{color:var(--ink)}
-.cel-ft{display:flex;flex-direction:column;gap:4px;padding:16px 16px 24px;position:sticky;bottom:0;background:linear-gradient(rgba(27,28,30,0),#1B1C1E 30%)}
+.cel-ft{display:flex;flex-direction:column;gap:4px;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));position:sticky;bottom:0;background:linear-gradient(rgba(27,28,30,0),#1B1C1E 30%)}
 .cel-ft.row{flex-direction:row;gap:8px}
 .cel-ft:not(.row) .cel-p{flex:none}
 .cel-p{height:56px;border:0;border-radius:14px;background:var(--cta);color:#fff;font-family:var(--font);font-size:16px;font-weight:700;cursor:pointer;flex:1.6}
@@ -2150,9 +2180,36 @@ button.btn2,.qw .btn2,.co-btn.lg,button.mr-cta,.hh-cta{height:52px;border-radius
 .hh-phb-go{flex:none;display:inline-flex;align-items:center;gap:2px;height:32px;padding:0 10px 0 14px;border-radius:8px;background:var(--cta);font-size:13px;font-weight:700}
 .hh-phb:active{transform:scale(.99)}
 .mg-meta dd.mg-sub{font-weight:500;color:var(--ink-3)}
-.tsep,.hh .tsep{display:inline;background:none;padding:0;border:0;color:var(--ink-4);margin:0 5px;font-weight:700;font-size:inherit}.tbar,.hh .tbar{display:inline;background:none;padding:0;border:0;color:var(--ink-4);margin:0 8px;opacity:.6;font-size:inherit}
+.tsep,.hh .tsep{display:inline;background:none;padding:0;border:0;color:var(--ink-4);margin:0 5px;font-weight:700;font-size:inherit}
+/* v99: 구분점이 부모 span 규칙(.li.rec span 세로 flex 등)에 덮여 줄바꿈되던 문제 */
+span.tsep{display:inline!important;flex:none!important;gap:0!important;min-width:0!important;color:var(--ink-4)!important;font-size:inherit!important;line-height:inherit!important;margin:0 5px!important;font-weight:700!important}.tbar,.hh .tbar{display:inline;background:none;padding:0;border:0;color:var(--ink-4);margin:0 8px;opacity:.6;font-size:inherit}
 .mg-ib{all:unset;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;line-height:18px;cursor:pointer;margin:-6px -8px;padding:6px 8px;border-radius:8px}.mg-ib:active{background:var(--fill-2)}.mg-ib dd{margin:0;display:inline-flex;align-items:center;gap:2px;font-weight:600;color:var(--ink)}.mg-ib dd i{display:grid;color:var(--ink-4)}.mg-ib dd i svg{width:16px;height:16px}.mg-ib dt{color:var(--ink-3)}
 .mg-dl{margin:2px 0 0;display:flex;align-items:baseline;gap:8px;font-size:13px;line-height:18px;color:var(--ink-3)}.mg-dl b{flex:none;font-size:14px;font-weight:700}.mg-dl b.up{color:#2FD3B5}.mg-dl b.dn{color:#FFA938}.mg-dl b.flat{color:var(--ink-2)}.mg-dl span{min-width:0}
+
+/* v91: 스크롤 시 상·하단 바 숨김(아래로 숨김 · 위로 다시) */
+body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:12;pointer-events:none}
+.wrap>.brand:not(.co-brand){position:sticky;top:env(safe-area-inset-top,0px);z-index:8;background:var(--bg);transition:transform .25s ease}
+.tabbar,.cta-bar,.rest{transition:transform .28s cubic-bezier(.2,.9,.3,1)}
+body.bars-off .tabbar{transform:translateY(calc(100% + 8px))}
+body.bars-off .cta-bar,body.bars-off .rest{transform:translateY(calc(var(--tabbar) - 6px))}
+body.bars-off .wrap>.brand:not(.co-brand){transform:translateY(calc(-100% - env(safe-area-inset-top,0px) - 6px))}
+@media (prefers-reduced-motion:reduce){.tabbar,.cta-bar,.rest,.wrap>.brand{transition:none}}
+/* v91: 코치 상단 로고가 진행 막대와 겹치지 않게 */
+.co .co-brand.brand{margin-top:0;margin-bottom:8px;height:40px}
+/* v91: 처음 시작 — 기록 가져오기 */
+.co-imp{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 8px;padding:8px 8px 8px 16px;border-radius:12px;background:var(--surface);font-size:14px;line-height:20px;color:var(--ink-2)}
+.co-imp[hidden]{display:none}
+.co-imp button{flex:none;height:32px;padding:0 12px;border:0;border-radius:8px;background:var(--fill-2);color:var(--ink);font:600 13px/1 var(--font);cursor:pointer}
+.sheet.over{z-index:60}
+/* v91: 기록 옮기기 · 앱처럼 쓰기 */
+.mv p{margin:0;font-size:14px;line-height:20px;color:var(--ink-2)}
+.mv-btn{height:52px}
+.mv-btn.pri{width:100%;background:var(--fill-2)}
+.pwa-warn{margin:8px 0 0!important;padding:10px 12px;border-radius:12px;background:rgba(255,155,60,.10);color:#FFB86B!important;font-size:13px!important;line-height:18px!important}
+.pwa-st{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:15px;line-height:22px;color:var(--ink)}
+.pwa-st b,.pwa-warn b{font-weight:700;font-size:inherit!important;line-height:inherit!important;color:inherit;display:inline}
+.mv-ok{display:flex;align-items:center;gap:8px;font-size:14px;line-height:20px;color:var(--ink-2)}
+.mv-ok b{color:#2FD3B5;font-weight:700}
 </style>
 
 <div class="tbar" id="tbar" hidden><span>테스트 중이에요. 내 기록은 따로 그대로 있어요.</span><button id="tbarEnd" type="button">테스트 끝내기</button></div>
@@ -2171,6 +2228,7 @@ button.btn2,.qw .btn2,.co-btn.lg,button.mr-cta,.hh-cta{height:52px;border-radius
   <header class="brand co-brand"><button class="co-rs" id="coRs" type="button" hidden>처음부터 하기</button><span class="br-sp" aria-hidden="true"></span><span class="br-logo" aria-label="hardwrk">hardwrk</span><button class="br-add" id="coClose" type="button" aria-label="코치 닫기"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><button class="co-sbtn" id="coEnd" type="button" hidden>테스트 끝내기</button><button class="co-sbtn" id="coReset" type="button" hidden>새로 시작</button></header>
   <div class="co-prog" id="coProg" hidden role="progressbar" aria-label="질문 진행률" aria-valuemin="0" aria-valuemax="100"><i></i></div>
   <div class="co-cond" id="coCond" hidden></div>
+  <div class="co-imp" id="coImp" hidden><span>다른 기기에서 쓰던 기록이 있나요?</span><button type="button" id="coImpBtn">기록 가져오기</button></div>
   <main class="co-log" id="coLog" aria-live="polite"></main>
   <div class="co-dock" id="coDock"></div>
   <form class="co-comp" id="coComp"><textarea id="coInp" rows="1" aria-label="코치에게 보낼 메시지"></textarea><button class="co-send" id="coSend" type="submit" aria-label="보내기"></button></form>
@@ -2293,8 +2351,11 @@ function allGears(){const m=new Map(),add=(g,t)=>{g=String(g||'').trim();if(!g)r
   for(const id in drafts){const d=drafts[id];for(const k in d)if(d[k]&&d[k].gear)add(d[k].gear,1e6)}return m}
 function canonGear(g){g=String(g||'').trim();if(!g)return'';const o=allGears().get(gearNorm(g));return o?o.g:g}
 function lastGear(k,before){const h=history(k,before).filter(x=>x.gear);return h.length?h[h.length-1].gear:''}
-function gearsFor(k){const m=allGears(),used=[];sessions.filter(s=>s.entries&&s.entries[k]&&s.entries[k].gear).sort((a,b)=>a.date<b.date?1:-1).forEach(s=>{const c=canonGear(s.entries[k].gear);if(!used.includes(c))used.push(c)});
-  const rest=[...m.values()].sort((a,b)=>b.last-a.last).map(x=>x.g).filter(g=>!used.includes(g));return{used,rest}}
+/* v93: 기구 메모 추천은 같은 부위(가슴·등·어깨·팔·하체) 종목에 적은 메모만 보여줘요. 부위를 모르는 종목은 전체 */
+const gearPart=k=>{const p=PARTS[k];return p?vMain(coPart(p)):''};
+function gearsFor(k){const m=allGears(),used=[],P=gearPart(k),same=new Set();sessions.filter(s=>s.entries&&s.entries[k]&&s.entries[k].gear).sort((a,b)=>a.date<b.date?1:-1).forEach(s=>{const c=canonGear(s.entries[k].gear);if(!used.includes(c))used.push(c)});
+  if(P){sessions.forEach(s=>{const E=s.entries||{};for(const x in E)if(E[x]&&E[x].gear&&gearPart(x)===P)same.add(gearNorm(E[x].gear))});for(const id in drafts){const d=drafts[id];for(const x in d)if(d[x]&&d[x].gear&&gearPart(x)===P)same.add(gearNorm(d[x].gear))}}
+  const rest=[...m.values()].sort((a,b)=>b.last-a.last).map(x=>x.g).filter(g=>!used.includes(g)&&(!P||same.has(gearNorm(g))));return{used,rest}}
 function paintGearSug(inp){const k=inp.dataset.gk,box=document.getElementById('gs-'+k);if(!box)return;const q=gearNorm(inp.value),{used,rest}=gearsFor(k);
   let list=used.map(g=>({g,u:true})).concat(rest.map(g=>({g,u:false})));const exact=list.some(x=>gearNorm(x.g)===q);list=list.filter(x=>gearNorm(x.g)!==q);if(q&&!exact)list=list.filter(x=>gearNorm(x.g).includes(q));list=list.slice(0,6);
   if(!list.length){box.hidden=true;box.innerHTML='';return}
@@ -2392,8 +2453,20 @@ function collapseOverview(anchorId){if(state.main!=='work'||!document.querySelec
   const n=document.getElementById(anchorId);if(n&&t!=null)window.scrollBy(0,n.getBoundingClientRect().top-t)}
 let sheetPick=null;
 function weekDone(ref){const ws=weekStart(ref||TODAY),we=addDays(ws,6),m={};sessions.filter(s=>s.date>=ws&&s.date<=we).sort((a,b)=>a.date<b.date?-1:1).forEach(s=>m[s.day]=s.date);return m}
-function pickRow(id,t,sub,chip,sel,dis){return '<button class="pick-row'+(sel?' sel':'')+(dis?' dis':'')+(!dis&&chip&&chip.indexOf('오늘 추천')>=0?' rec':'')+'" role="radio" aria-checked="'+!!sel+'"'+(dis?' disabled aria-disabled="true"':'')+' data-pick="'+id+'"><span class="pk-ic">'+(dis?CHECK:id==='run'?RUNI:DUMB)+(id==='run'?'':'<em>'+id.slice(1)+'</em>')+'</span><span class="pk-t"><strong>'+t+'</strong><small>'+sub+'</small></span>'+(chip||'')+'</button>'}
-function pickActions(go,same){return[{id:'close',label:'닫기',grow:1},{id:'pickok',label:'확인',primary:true,grow:1,fn:()=>{if(sheetPick&&sheetPick!==same)go(sheetPick)}}]}
+/* v91: 루틴 카드 공통 컴포넌트 — 운동 탭(남은·완료 루틴), 홈 [+] 오늘 운동 시작하기, 루틴 바꾸기 시트가 모두 이 함수 하나로 그려요.
+   kind: ''(기본) · 'rec'(오늘 추천, 가장 큼) · 'done'(완료, 가장 작음) / chip.k: fill=오늘 · tint=다음 차례 · ing=진행 중 · text=글자만 · done=완료 */
+function goRowHTML(txt){return '<span class="pk-go"><span>'+txt+'</span><b>시작하기<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></b></span>'}
+function rtCard(o){const run=o.id==='run',done=o.kind==='done',P=run?null:PROGRAM[o.id];
+  const ic='<span class="pk-ic">'+(done?CHECK:run?RUNI:DUMB)+(run?'':'<em>'+o.id.slice(1)+'</em>')+'</span>';
+  const m='<span class="pk-m"><strong>'+(P?'<span class="sr">'+P.label+' </span>':'')+esc(o.title)+'</strong>'+(o.sub&&!done?'<small>'+o.sub+'</small>':'')+'</span>';
+  const c=o.chip&&o.chip.t?'<span class="ov-st'+({fill:' next',tint:' rx-nx',ing:' next ing',done:' done',text:''}[o.chip.k]||'')+'">'+(o.chip.k==='done'?CHECK:'')+o.chip.t+'</span>':'';
+  return '<button type="button" class="pk-card'+(o.kind?' '+o.kind:'')+'" '+(o.attr||'')+(o.dis?' aria-disabled="true"':'')+'>'+ic+m+c+(o.kind==='rec'&&o.go?o.go:'')+'</button>'}
+let sheetGo=null;
+function pickRow(id,t,sub,chip,sel,dis){const txt=chip?chip.replace(/<[^>]+>/g,''):'';
+  const k=dis||/class="done"/.test(chip||'')?'done':!txt?'':/진행 중/.test(txt)?'ing':/오늘 추천/.test(txt)?'fill':txt==='선택됨'?'text':'tint';
+  const lab=k==='tint'&&/이번 루틴/.test(txt)?'다음 차례':k==='text'?'지금 루틴':k==='done'?'완료':txt;
+  return rtCard({id,title:t,sub,kind:k==='done'?'done':k==='fill'?'rec':'',chip:k?{k,t:lab}:null,attr:'data-pick="'+id+'"',dis,go:goRowHTML('지금 하기 좋은 루틴이에요')})}
+function pickActions(go,same){sheetGo=id=>{if(id!==same)go(id)};return[{id:'close',label:'닫기',fn:()=>{}}]}
 function openSwitchSheet(){const cur=state.mode,nx=suggestNext();sheetPick=cur;
   const body='<p class="sw-note">입력하던 기록은 임시저장돼요. 다시 이 루틴으로 돌아오면 이어서 할 수 있어요.</p><div class="pick" role="radiogroup"><div class="pk-l sm"><h3>웨이트</h3><span>'+ORDER.map(x=>x.slice(1)).join(' → ')+' 순서대로</span></div>'+ORDER.map(id=>{const P=PROGRAM[id],wd=weekDone()[id],dis=!!wd&&id!==cur;
     return pickRow(id,P.title,dis?'이번 주 '+short(wd)+' ('+dowOf(wd)+') 완료':rSub(P),id===cur?'<em>'+(inProgress()?'진행 중':'선택됨')+'</em>':dis?'<em class="done">완료</em>':id===nx?'<em class="sub">이번 루틴</em>':'',id===cur,dis)}).join('')+'<div class="pk-l sm"><h3>러닝</h3><span>쉬는 날 자유롭게 · 주 1회</span></div>'+pickRow('run','러닝 5km','편한 페이스 · '+durText('run'),cur==='run'?'<em>선택됨</em>':'',cur==='run')+'</div>';
@@ -2431,20 +2504,20 @@ function pickView(extra){
   let h='<section class="pk-top"><h1 class="pk-h">루틴을 골라 주세요'+helpBtn('work')+'</h1><p class="pk-s">이번 주 루틴 '+nd+' / '+ORDER.length+(runOff()?(wr.length?' · 러닝 '+wr.length+'회':''):' · 러닝 '+wr.length+' / 1')+'</p>'+helpPanel('work','<div class="list-card rules">'+HELP_WORK+'</div>')+'</section>'+sysBanners()+(extra||'');
   /* v49: 남은 루틴 · 완료 루틴 — 오늘 추천(가장 큼) > 남은 루틴 > 완료(가장 작음) */
   const goTxt=tw==='오늘 추천'?'지금 하기 좋은 루틴이에요':tw==='내일 추천'?'내일 하기 좋은 루틴이에요':'순서상 이번 차례예요';
-  const goRow='<span class="pk-go"><span>'+goTxt+'</span><b>시작하기<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></b></span>';
+  const goRow=goRowHTML(goTxt);
   const top=[],rest=[],fin=[];
   for(const id of ORDER){const p=PROGRAM[id],done=wk.filter(s=>s.day===id).map(s=>s.date).sort().pop(),n=id.slice(1);
     if(id===lid){const c=liveCur(id),pct=c.tot?Math.round(c.done/c.tot*100):0,pz=TM[TODAY+'_'+id].paused;
       top.push('<button class="pk-card now" data-mode="'+id+'" aria-label="진행 중인 '+p.label+' '+esc(p.title)+'로 돌아가기"><span class="pk-ic">'+DUMB+'<em>'+n+'</em></span><span class="pk-m"><strong>'+esc(p.title)+'</strong><small>'+(pz?'일시정지 · ':'')+esc(c.name)+' · '+c.c+' / '+c.t+'세트</small></span><time id="pkT" class="num">'+hms(elapsed(TODAY+'_'+id)/1000)+'</time>'+
         '<span class="pk-lv"><span class="pk-bar"><i style="width:'+pct+'%"></i></span><span class="pk-lt"><span>진행</span><span class="num">'+c.done+' / '+c.tot+'세트</span></span></span></button>');continue}
-    if(done){fin.push({d:done,h:'<button class="pk-card done" data-mode="'+id+'"'+(done!==TODAY?' aria-disabled="true"':'')+'><span class="pk-ic">'+CHECK+'<em>'+n+'</em></span><span class="pk-m"><strong><span class="sr">'+p.label+' </span>'+esc(p.title)+'</strong></span><span class="ov-st done">'+CHECK+'완료</span></button>'});continue}
+    if(done){fin.push({d:done,h:rtCard({id,title:p.title,kind:'done',chip:{k:'done',t:'완료'},attr:'data-mode="'+id+'"',dis:done!==TODAY})});continue}
     const isRec=id===rec&&!lid,draft=hasData(drafts[TODAY+'_'+id]);
     const isNx=!isRec&&id===nxId,ch=planChip(A,id);
-    const st=draft?'<span class="ov-st next ing">진행 중</span>':isRec?'<span class="ov-st next">'+tw+'</span>':isNx?'<span class="ov-st rx-nx">'+nxTxt+'</span>':ch?'<span class="ov-st">'+ch+'</span>':'';
-    (isRec?top:rest).push('<button class="pk-card'+(isRec?' rec':'')+'" data-mode="'+id+'"><span class="pk-ic">'+DUMB+'<em>'+n+'</em></span><span class="pk-m"><strong><span class="sr">'+p.label+' </span>'+esc(p.title)+'</strong><small>'+p.items.length+'종목 · '+durText(id)+'</small></span>'+st+(isRec?goRow:'')+'</button>')}
+    const st=draft?{k:'ing',t:'진행 중'}:isRec?{k:'fill',t:tw}:isNx?{k:'tint',t:nxTxt}:ch?{k:'text',t:ch}:null;
+    (isRec?top:rest).push(rtCard({id,title:p.title,sub:p.items.length+'종목 · '+durText(id),kind:isRec?'rec':'',chip:st,attr:'data-mode="'+id+'"',go:goRow}))}
   const km=wr.reduce((a,r)=>a+r.km,0),rRec=!lid&&rec==='run';
-  if(wr.length){const ld=wr.map(r=>r.date).sort().pop();fin.push({d:ld,h:'<button class="pk-card run done" data-mode="run"><span class="pk-ic">'+CHECK+'</span><span class="pk-m"><strong>러닝 5km</strong></span><span class="ov-st done">'+CHECK+'완료</span></button>'})}
-  else if(!runIn)(rRec?top:rest).push('<button class="pk-card run'+(rRec?' rec':'')+'" data-mode="run"><span class="pk-ic">'+RUNI+'</span><span class="pk-m"><strong>러닝 5km</strong><small>편한 페이스 · '+durText('run')+'</small></span>'+(rRec?'<span class="ov-st next">'+tw+'</span>'+goRow:'<span class="ov-st">'+(runOff()?'원할 때':planChip(A,'run'))+'</span>')+'</button>');
+  if(wr.length){const ld=wr.map(r=>r.date).sort().pop();fin.push({d:ld,h:rtCard({id:'run',title:'러닝 5km',kind:'done',chip:{k:'done',t:'완료'},attr:'data-mode="run"'})})}
+  else if(!runIn)(rRec?top:rest).push(rtCard({id:'run',title:'러닝 5km',sub:'편한 페이스 · '+durText('run'),kind:rRec?'rec':'',chip:rRec?{k:'fill',t:tw}:{k:'text',t:runOff()?'원할 때':planChip(A,'run')},attr:'data-mode="run"',go:goRow}));
   const left=top.concat(rest);
   if(restNow&&(left.length||runIn))h+='<section class="rx-rest" aria-label="오늘 상태"><div class="rx-h"><span class="rx-ic">'+MOONI+'</span><span class="rx-m"><strong>'+esc(tg.title)+'</strong><small>'+esc(tg.sub)+'</small></span></div>'+
     (runIn?'<div class="rx-a'+(tg.runPend?' rec':'')+'"><span>'+(tg.runPend?'러닝하기 좋은 날이에요':runOff()?'러닝은 원할 때 해도 좋아요':'한 번 더 달려도 좋아요')+'</span><button class="rx-run'+(tg.runPend?' rec':'')+'" type="button" data-mode="run">'+RUNI+'러닝 기록하기'+(tg.runPend?'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>':'')+'</button></div>':'')+'</section>';
@@ -2602,15 +2675,24 @@ function renderRoutine(){
     for(const it of ord){const k=pick(it.k,cycle),n=pick(it.n,cycle),inc=incOf(it,cycle),a=advise(k,it.sets,inc,date),dv=d[k];
       if(ssEnd&&prevK===ssEnd){h+='</div>';ssEnd=null}prevK=k;
       {const p=pairOf(k);if(p&&!ssEnd&&ord.indexOf(ord.find(x=>pick(x.k,cycle)===p))===ord.indexOf(it)+1){ssEnd=p;h+='<div class="ssx"><div class="ssx-h"><span class="ssx-b">'+LINKI+'슈퍼세트</span><small>한 세트씩 번갈아 해요</small>'+(past?'':'<button class="ssx-off" type="button" data-ssxoff="'+k+'">되돌리기</button>')+'</div>'}}
-      const subs=[it.sets+'세트 × '+tgt(k)+'회'];if(it.sw)subs.push('오늘만 · 원래 '+esc(it.sw.n));if(it.added)subs.push('오늘만 추가');
+      const subs=[];/* v96: 세트·반복 수는 세트 표와 겹쳐 뺐어요(접힌 카드에는 그대로) */if(it.sw)subs.push('오늘만 · 원래 '+esc(it.sw.n));if(it.added)subs.push('오늘만 추가');
       const doneN=dv.sets.filter(s=>isChk(s)&&+s.r>=tgt(k)).length;
       idx++;
       if(isDone(dv)&&!dv.edit&&!dropPend(dv)){h+=lockedCard(k,n,it,cycle,dv,doneN);continue}
       const prog=dv.sets.some(isChk)&&dv.sets.some(x=>!isChk(x))||dropPend(dv);
       if(k!==openK&&!dv.edit&&!prog&&!(pairOf(k)&&pairOf(k)===openK)){const chk=dv.sets.filter(isChk).length,miss=dv.sets.some((s,i)=>state.missing.has('w-'+k+'-'+i)||state.missing.has('r-'+k+'-'+i));
         h+='<button id="card-'+k+'" class="card pend'+(miss?' has-miss':'')+'" data-open="'+k+'" aria-label="'+esc(n)+' 펼치기"><span class="pd-n">'+idx+'</span><span class="pd-m"><strong>'+esc(n)+(typeof it.k==='object'?' <i class="ab">'+cycle+'</i>':'')+(edited(state.logDate,state.mode,k,dv)?EDC:'')+'</strong><small>'+it.sets+'세트 × '+tgt(k)+'회'+(a.weight!=null?' · '+(isLb(k)?fmt(r05(toLb(a.weight)))+'lb':fmt(a.weight)+'kg'):' · 첫 기록')+'</small></span>'+(chk?'<span class="status k-hold">'+chk+'/'+it.sets+'</span>':'')+CHEV+'</button>';continue}
-      h+='<article id="card-'+k+'" class="card open'+(dv.sets.some((s,i)=>state.missing.has('w-'+k+'-'+i)||state.missing.has('r-'+k+'-'+i))?' has-miss':'')+'"><div class="card-top"><div class="card-name"><strong>'+esc(n)+(typeof it.k==='object'?' <i class="ab" title="'+cycle+'주 머신">'+cycle+'</i>':'')+(!dv.edit&&edited(state.logDate,state.mode,k,dv)?EDC:'')+'</strong><small>'+subs.join(' · ')+'</small></div>'+(dv.edit?'<span class="status k-edit">수정 중</span>':'<span class="status k-'+a.kind+'">'+a.label+'</span>')+'</div>';
-      {const gb=!/덤벨|바벨/.test(n),bs=(past||pairOf(k)?'':'<button class="cx-b" type="button" data-ssx="'+k+'">'+LINKI+'슈퍼세트</button>')+(past||dv.drops?'':'<button class="cx-b" type="button" data-drx="'+k+'">'+DROPI+'드롭세트</button>')+(!past&&!dv.sets.some(isChk)&&!pairOf(k)?(it.added?'<button class="cx-b sw-on" type="button" data-addrm="'+k+'">'+SWAPI+'빼기</button>':it.sw?'<button class="cx-b sw-on" type="button" data-swback="'+k+'">'+SWAPI+'원래대로</button>':'<button class="cx-b" type="button" data-swap="'+k+'">'+SWAPI+'종목 바꾸기</button>'):'')+(gb?'<button class="cx-b cx-g'+(dv.gear?' on':'')+'" type="button" data-gearm="'+k+'" aria-label="기구 메모'+(dv.gear?' · '+esc(dv.gear):'')+'">'+GEARI+'<span>'+(dv.gear?esc(dv.gear):'기구 메모')+'</span></button>':'');if(bs)h+='<div class="cx">'+bs+'</div>'}
+      h+='<article id="card-'+k+'" class="card open'+(dv.sets.some((s,i)=>state.missing.has('w-'+k+'-'+i)||state.missing.has('r-'+k+'-'+i))?' has-miss':'')+'"><div class="card-top"><div class="card-name"><strong>'+esc(n)+(typeof it.k==='object'?' <i class="ab" title="'+cycle+'주 머신">'+cycle+'</i>':'')+(!dv.edit&&edited(state.logDate,state.mode,k,dv)?EDC:'')+'</strong></div>'+(dv.edit?'<span class="status k-edit">수정 중</span>':'<span class="status k-'+a.kind+'">'+a.label+'</span>')+'</div>';
+      {const gb=!/덤벨|바벨/.test(n),bs=(past||pairOf(k)?'':'<button class="cx-b" type="button" aria-label="슈퍼세트로 묶기" data-ssx="'+k+'">'+LINKI+'<span>슈퍼</span></button>')+(past||dv.drops?'':'<button class="cx-b" type="button" aria-label="드롭세트 하기" data-drx="'+k+'">'+DROPI+'<span>드롭</span></button>');
+        /* v96: C안 — 세트 줄 = 세트 수 · 기구 메모(왼쪽) + 종목 바꾸기(오른쪽 끝). 첫 세트 체크 뒤에도 바꿀 수 있고, 입력한 값이 있으면 확인 시트 */
+        if(dv.gear===undefined)dv.gear=lastGear(k,date)||'';
+        const swB=past||pairOf(k)?'':it.added?'<button class="cx-s am" type="button" data-addrm="'+k+'">'+SWAPI+'빼기</button>':it.sw?'<button class="cx-s am" type="button" data-swback="'+k+'">'+SWAPI+'원래대로</button>':'<button class="cx-s" type="button" data-swap="'+k+'">'+SWAPI+'종목 바꾸기</button>';
+        const gmB=gb?'<button class="cx-m'+(dv.gear?'':' em')+'" type="button" data-gearm="'+k+'" aria-label="기구 메모'+(dv.gear?' · '+esc(dv.gear):'')+'">'+GEARI+'<span>'+(dv.gear?esc(dv.gear):'기구 메모')+'</span></button>':'';
+        const mt=(subs.length?'<span class="cx-sub">'+subs.join(' · ')+'</span>':'')+(subs.length&&gmB?'<i class="cx-dot" aria-hidden="true">·</i>':'')+gmB;
+        /* v97: 왼쪽에 보일 게 없으면(덤벨·바벨 등) 세트 줄을 만들지 않고 종목 바꾸기를 슈퍼·드롭 줄 오른쪽 끝으로 */
+        const swIn=!mt&&swB?swB.replace('class="cx-s','class="cx-s cx-s-in'):'';
+        if(mt)h+='<div class="cx-sr"><div class="cx-meta">'+mt+'</div>'+swB+'</div>';
+        if(bs||swIn)h+='<div class="cx">'+bs+swIn+'</div>'}
       h+='<div class="hint">'+(a.last?'<span>지난 '+short(a.last.date)+(a.last.gear?' · '+esc(a.last.gear):'')+' · <b>'+a.last.sets.map(s=>wL(s)+'×'+s.r).join('  ')+'</b></span>':'')+(a.note?'<span class="ai-note"><i aria-hidden="true">✦</i><span>'+esc(a.note)+'</span></span>':'')+'</div>';
       if(dv.gear===undefined)dv.gear=lastGear(k,date)||'';lbSync(k,dv);
       h+='<div class="sets"><div class="set-h"><span>세트</span><span class="ut-h">무게<span class="ut" role="group" aria-label="무게 단위"><button type="button" data-unit="'+k+'" data-u="kg" aria-pressed="'+!isLb(k)+'">kg</button><button type="button" data-unit="'+k+'" data-u="lb" aria-pressed="'+isLb(k)+'">lb</button></span></span><span>반복</span><span id="cnt-'+k+'">'+doneN+'/'+it.sets+'</span></div>';
@@ -2703,6 +2785,11 @@ function swCands(it,k){const pf=CO&&CO.profile||{},bad=[...vBadSet(pf)],part=vMa
   const seen=new Set([cur]),out=[];const add=(n,s,same)=>{if(seen.has(n)||inDay.has(n)||bad.some(b=>n.includes(b)))return;seen.add(n);out.push({n,s,same,eq:eqOf(n)})};
   const lib=s=>{const L=SUBLIB[s]||{};return[].concat(L.big||[],L.gen||[],L.home||[],L.bw||[])};
   if(sub)lib(sub).forEach(n=>add(n,sub,true));(PARTSUB[part]||[]).filter(s=>s!==sub).forEach(s=>lib(s).forEach(n=>add(n,s,false)));return{cur,sub,part,list:out}}
+/* v96: 입력한 값(체크한 세트·적은 반복 수·드롭)이 있는 종목을 바꾸거나 뺄 때 한 번 더 물어봐요 */
+function swEntered(k){const v=curDraft(k);if(!v)return 0;return (v.sets||[]).filter(x=>isChk(x)||String(x.r??'').trim()!=='').length+((v.drops||[]).some(x=>x.c)?1:0)}
+function swGuard(k,verb,go){const n=swEntered(k);if(!n){go();return}
+  showSheet('입력한 기록이 있어요','<div class="gm"><p class="gm-c">'+esc(NAMES[k]||'이 종목')+'에 입력한 기록은 '+(verb==='되돌리기'?'원래 종목으로 옮겨지지 않고':verb==='빼기'?'종목과 함께 빠지고':'새 종목으로 옮겨지지 않고')+' 저장되지 않아요.</p></div>',
+    [{id:'sgx',label:'취소',grow:1,fn:()=>{}},{id:'sgok',label:'그래도 '+verb,primary:true,grow:1.6,fn:()=>{track('swap_guard',{verb});setTimeout(go,0)}}])}
 function swOpen(k,prev){const it=itemOf(k);if(!it)return;const idx=PSWAP[state.mode]?PSWAP[state.mode].items.findIndex(x=>pick(x.k,weekInfo(state.logDate).cycle)===k):PROGRAM[state.mode].items.indexOf(it);
   SW=prev||{k,idx:idx<0?PROGRAM[state.mode].items.indexOf(it):idx,it,pick:null,custom:'',scope:'today',noM:false,C:swCands(it,k)};
   showSheet(esc(SW.C.cur)+' 대신할 종목','<div class="swb" id="swBox"></div>',[{id:'swx',label:'취소',grow:1,fn:()=>{SW=null}},{id:'swok',label:'다음',primary:true,grow:1.6,fn:()=>swNext()}]);swRender()}
@@ -2954,7 +3041,7 @@ function renderRecord(){
   h+=renderKpi()+renderReport();
   h+='<div class="grp">'+secTitle('몸 기록','선택 입력')+renderToday()+'<div class="seg" style="--n:3" role="tablist">'+[['lift','근력'],['comp','체성분'],['run','러닝']].map(([k,l])=>'<button role="tab" data-sub="'+k+'" aria-selected="'+(state.sub===k)+'">'+l+'</button>').join('')+'</div>'+
     (state.sub==='lift'?renderLift():state.sub==='run'?renderRuns():renderComp())+'</div>';
-  if(HW_TEST)h+=moveSection()+'<p class="credit reset-link"><button class="an-link" id="testEndBtn" type="button">처음부터 하기</button></p>';
+  if(HW_TEST)h+=pwaSection()+moveSection()+'<p class="credit reset-link"><button class="an-link" id="testEndBtn" type="button">처음부터 하기</button></p>';
   return h}
 function renderDietTab(){const b=dietBasis();return header('식단',b?'오늘 식단 · '+b:'오늘 하루 식단')+'<div class="grp">'+renderDiet()+'</div>'+renderDietRules()}
 function dietBasis(){const rec=recordType(),plan=getPlan(),ad=autoDietType();return rec?'오늘 운동 기록 기준':plan?'직접 선택':ad?'맞춤 추천 기준':''}
@@ -3177,28 +3264,70 @@ function goalSave(g){GOAL=Object.assign({},GOAL,g,{savedAt:new Date().toISOStrin
   try{localStorage.setItem('liftlog.goal',JSON.stringify(GOAL))}catch(e){}
   try{if(db&&!readOnly)db.doc('plans/goal').set(GOAL)}catch(e){}
   if(typeof CO!=='undefined'&&CO&&CO.profile&&CO.profile.goal&&GOAL.goal){CO.profile.goal=GOAL.goal;try{coSave()}catch(e){}}}
+
+/* v91: 홈 화면에 추가(PWA) — 주소창 없이 전체 화면으로 열리게 */
+const isStandalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true}catch(e){return false}};
+let bip=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();bip=e});
+window.addEventListener('appinstalled',()=>{bip=null;try{toast('홈 화면에 추가했어요. 이제 아이콘으로 열어 주세요')}catch(e){}});
+function pwaSection(){if(isStandalone())return '';
+  return '<div class="grp">'+secTitle('앱처럼 쓰기','')+'<div class="mv"><p>홈 화면에 추가하면 주소창 없이 앱처럼 전체 화면으로 열려요. 아이폰 사파리는 7일 넘게 열지 않은 사이트의 저장 기록을 지울 수 있어서, 홈 화면 앱으로 쓰는 게 더 안전해요.</p><button class="mv-btn pri" id="pwaAdd" type="button">홈 화면에 추가하기</button></div></div>'}
+async function pwaAdd(){if(bip){const p=bip;bip=null;try{p.prompt();const r=await p.userChoice;if(r&&r.outcome==='accepted'){track('pwa_install');return}}catch(e){}return}
+  const ua=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1),inapp=/KAKAOTALK|Instagram|FBAN|FBAV|NAVER|Line\//i.test(ua),br=ios?'사파리':'크롬';
+  let body,acts=[{id:'pwax',label:'확인',primary:true,fn:()=>{}}];
+  if(inapp){body='<div class="cond-ask"><p>지금은 앱 안에서 연 브라우저라서 홈 화면에 추가할 수 없어요. '+br+'로 연 다음 다시 눌러 주세요.</p><p class="pwa-warn">기록은 브라우저마다 따로 저장돼요. 옮기기 전에 아래 [내보내기]로 기록 키부터 챙겨 주세요.</p></div>';
+    if(/KAKAOTALK/i.test(ua))acts=[{id:'pwaext',label:br+'로 열기',primary:true,grow:1,fn:()=>{location.href='kakaotalk://web/openExternal?url='+encodeURIComponent(location.href)}},{id:'pwax',label:'닫기',grow:1,fn:()=>{}}].reverse()}
+  else if(ios)body='<div class="cond-ask"><ol class="pwa-st"><li>사파리의 <b>공유</b> 버튼을 눌러요 (안 보이면 ⋯ 메뉴 안에 있어요)</li><li><b>홈 화면에 추가</b>를 골라요</li><li>홈 화면의 hardwrk 아이콘으로 열어요</li></ol><p class="pwa-warn">아이폰은 홈 화면 앱과 사파리의 기록이 따로 저장돼요. 지금 쓰던 기록이 있으면 먼저 [내보내기]로 기록 키를 복사하고, 홈 화면 앱을 처음 열 때 [기록 가져오기]에 붙여 넣어 주세요.</p></div>';
+  else body='<div class="cond-ask"><ol class="pwa-st"><li>크롬 오른쪽 위 <b>⋮ 메뉴</b>를 눌러요</li><li><b>홈 화면에 추가</b> 또는 <b>앱 설치</b>를 골라요</li><li>홈 화면의 hardwrk 아이콘으로 열어요</li></ol></div>';
+  showSheet('홈 화면에 추가하기',body,acts);track('pwa_guide',{ios:ios?1:0,inapp:inapp?1:0})}
+document.addEventListener('click',e=>{if(e.target.closest('#pwaAdd'))pwaAdd()});
+(async()=>{try{if(!window.claude&&navigator.storage&&navigator.storage.persist)await navigator.storage.persist()}catch(e){}})();
+/* v91: 스크롤 내리면 하단 탭 바·상단 로고 줄을 숨기고, 올리면 다시 보여요 */
+(function(){let ly=window.scrollY,acc=0,tick=false;const B=document.body;
+  const set=off=>{if(B.classList.contains('bars-off')!==off)B.classList.toggle('bars-off',off)};
+  window.addEventListener('scroll',()=>{if(tick)return;tick=true;requestAnimationFrame(()=>{tick=false;const y=Math.max(0,window.scrollY),d=y-ly;ly=y;
+    if(B.style.overflow==='hidden')return;
+    const end=y+window.innerHeight>=document.documentElement.scrollHeight-4;
+    if(y<56){set(false);acc=0;return}
+    if((d>0)!==(acc>0))acc=0;acc+=d;
+    if(acc>14&&!end)set(true);else if(acc<-14)set(false)})},{passive:true});
+  document.addEventListener('click',e=>{if(e.target.closest('[data-main]'))set(false)},true);
+  window.HW_BARS=set})();
+/* v91: 처음 시작 화면 — 다른 기기 기록 가져오기 */
+document.getElementById('coImpBtn').addEventListener('click',()=>{document.getElementById('sheet').classList.add('over');mvIn()});
+document.getElementById('coComp').addEventListener('submit',()=>{const ci=document.getElementById('coImp');if(ci)ci.hidden=true});
+document.getElementById('coDock').addEventListener('click',e=>{if(e.target.closest('button')){const ci=document.getElementById('coImp');if(ci)ci.hidden=true}});
 /* v67: 다른 브라우저로 옮기기 — 로그인 없는 사용자는 기록이 브라우저마다 따로라서, 파일·코드로 내보내고 가져와요 */
-function moveSection(){return '<div class="grp">'+secTitle('다른 브라우저에서 이어 쓰기','')+'<div class="mv"><p>기록은 지금 연 브라우저에만 저장돼요. 카톡에서 열었다가 크롬·사파리로 옮길 때는 여기서 내보낸 뒤, 새 브라우저에서 가져오기를 눌러 주세요.</p><div class="mv-b"><button class="mv-btn" id="mvOut" type="button">내보내기</button><button class="mv-btn" id="mvIn" type="button">가져오기</button></div></div></div>'}
+function moveSection(){return '<div class="grp">'+secTitle('기록 옮기기','')+'<div class="mv"><p>기록은 지금 쓰는 브라우저에만 저장돼요. 기기를 바꾸거나 다른 브라우저로 옮길 때는 여기서 기록 키를 내보낸 뒤, 새 곳에서 [가져오기]를 눌러 주세요.</p><div class="mv-b"><button class="mv-btn" id="mvOut" type="button">내보내기</button><button class="mv-btn" id="mvIn" type="button">가져오기</button></div></div></div>'}
 function mvPack(){const d={};HW_RAW.keys().forEach(k=>{if(k&&k.indexOf('liftlog.')===0&&k!=='liftlog.reset'&&k!=='liftlog.mode'){const v=HW_RAW.get(k);if(v!=null)d[k]=v}});try{flushEv()}catch(e){}try{persistNow()}catch(e){}
   HW_RAW.keys().forEach(k=>{if(k&&k.indexOf('liftlog.')===0&&k!=='liftlog.reset'&&k!=='liftlog.mode'){const v=HW_RAW.get(k);if(v!=null)d[k]=v}});
   return {app:'hardwrk',v:1,at:new Date().toISOString(),data:d}}
 const mvCode=o=>'HWK1:'+btoa(unescape(encodeURIComponent(JSON.stringify(o))));
 function mvParse(t){t=String(t||'').trim();try{if(t.startsWith('HWK1:'))t=decodeURIComponent(escape(atob(t.slice(5).replace(/\s+/g,''))));const o=JSON.parse(t);if(o&&o.app==='hardwrk'&&o.data&&typeof o.data==='object')return o}catch(e){}return null}
-function mvOut(){const o=mvPack(),n=Object.keys(o.data).length,day=TODAY.replace(/-/g,'');
-  showSheet('기록 내보내기','<div class="cond-ask"><p>파일로 저장하거나 코드를 복사해서, 옮길 브라우저의 [가져오기]에 넣어 주세요. 기록 '+n+'개 묶음이에요.</p></div>',
+/* v92: 기록 키를 gzip으로 줄여요(HWK2, 약 1/6 길이). 예전 키(HWK1)·파일(JSON)도 그대로 읽어요 */
+async function mvCode2(o){try{if(typeof CompressionStream==='undefined')throw 0;const st=new Blob([JSON.stringify(o)]).stream().pipeThrough(new CompressionStream('gzip'));const u=new Uint8Array(await new Response(st).arrayBuffer());let b='';for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return 'HWK2:'+btoa(b)}catch(e){return mvCode(o)}}
+async function mvParseAny(t){t=String(t||'').trim();if(!t)return{err:'empty'};
+  if(t[0]==='{'){try{const o=JSON.parse(t);if(o&&o.app==='hardwrk'&&o.data&&typeof o.data==='object')return{o}}catch(e){}return{err:'cut'}}
+  const i=t.search(/HWK[12]:/);if(i<0)return{err:'bad'};const v=t.charAt(i+3);let b=t.slice(i+5).replace(/[^A-Za-z0-9+\/=]/g,'');b=b.replace(/=+$/,'');while(b.length%4)b+='=';
+  try{let js;if(v==='2'){const bin=atob(b),u=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)u[k]=bin.charCodeAt(k);js=await new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'))).text()}else js=decodeURIComponent(escape(atob(b)));
+    const o=JSON.parse(js);if(o&&o.app==='hardwrk'&&o.data&&typeof o.data==='object')return{o}}catch(e){}
+  return{err:'cut'}}
+const mvErr=r=>r.err==='cut'?'기록 키가 끝까지 들어오지 않았어요. 키를 다시 복사하거나 [파일 고르기]로 가져와 주세요':r.err==='empty'?'파일을 고르거나 기록 키를 붙여 넣어 주세요':'hardwrk 기록 키가 아니에요. HWK로 시작하는 키를 붙여 넣어 주세요';
+function mvOut(){const o=mvPack(),n=Object.keys(o.data).length,day=TODAY.replace(/-/g,'');let key=mvCode(o);mvCode2(o).then(c=>{key=c});
+  showSheet('기록 내보내기','<div class="cond-ask"><p>내 기록 키를 만들었어요. 파일로 저장하거나 키를 복사해서, 새 기기·브라우저의 [가져오기]에 넣어 주세요.</p><p class="pwa-warn">기록 키에는 운동·몸 기록이 모두 들어 있어요. 키를 가진 사람은 누구나 내 기록을 열어 볼 수 있으니, 나만 보관하고 다른 사람에게 보내지 마세요.</p></div>',
     [{id:'mvfile',label:'파일로 저장',grow:1,fn:async()=>{const blob=new Blob([JSON.stringify(o)],{type:'application/json'});
-        try{if(!DL)throw 0;const r=await DL.save({filename:'hardwrk-'+day+'.json',data:blob});if(r&&r.status==='saved')toast('파일로 저장했어요')}catch(e){toast('이 브라우저에서는 파일 저장이 안 돼요. 코드 복사를 써 주세요')}}},
-     {id:'mvcopy',label:'코드 복사',primary:true,grow:1,fn:async()=>{const c=mvCode(o);try{await navigator.clipboard.writeText(c);toast('코드를 복사했어요. 새 브라우저의 [가져오기]에 붙여 넣어 주세요')}catch(e){const ta=document.createElement('textarea');ta.value=c;document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}ta.remove();toast(ok?'코드를 복사했어요. 새 브라우저의 [가져오기]에 붙여 넣어 주세요':'복사하지 못했어요. 파일로 저장을 써 주세요')}}},
+        try{if(!DL)throw 0;const r=await DL.save({filename:'hardwrk-'+day+'.json',data:blob});if(r&&r.status==='saved')toast('기록 키 파일을 저장했어요. 다른 사람에게는 보내지 마세요')}catch(e){if(e&&e.code==='declined')return;toast('이 브라우저에서는 파일 저장이 안 돼요. 키 복사를 써 주세요')}}},
+     {id:'mvcopy',label:'키 복사',primary:true,grow:1,fn:async()=>{const c=key;try{await navigator.clipboard.writeText(c);toast('기록 키를 복사했어요. 나만 보관하고 다른 사람에게는 보내지 마세요')}catch(e){const ta=document.createElement('textarea');ta.value=c;document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}ta.remove();toast(ok?'기록 키를 복사했어요. 나만 보관하고 다른 사람에게는 보내지 마세요':'복사하지 못했어요. 파일로 저장을 써 주세요')}}},
      {id:'mvx',label:'닫기',link:true,fn:()=>{}}])}
 let mvData=null,mvTxt='';
 function mvIn(){mvData=null;mvTxt='';
-  showSheet('기록 가져오기','<div class="cond-ask mv-in"><p>내보낸 파일을 고르거나, 복사한 코드를 붙여 넣어 주세요. <b>지금 이 브라우저의 기록은 가져온 기록으로 바뀌어요.</b></p><label class="mv-file"><input type="file" id="mvFile" accept="application/json,.json"><span>파일 고르기</span></label><textarea id="mvTxt" class="gear-in mv-ta" rows="3" placeholder="HWK1:로 시작하는 코드"></textarea><small id="mvMsg"></small></div>',
-    [{id:'mvcancel',label:'취소',grow:1,fn:()=>{}},{id:'mvgo',label:'가져오기',primary:true,grow:1,fn:()=>{const o=mvData||mvParse(mvTxt);
-      if(!o){toast('기록을 읽지 못했어요. 파일이나 코드를 다시 확인해 주세요');return}
-      HW_RAW.set('liftlog.import',JSON.stringify(o.data));setTimeout(()=>location.reload(),200)}}])}
+  showSheet('기록 가져오기','<div class="cond-ask mv-in"><p>내보낸 파일을 고르거나, 복사한 기록 키를 붙여 넣어 주세요. <b>지금 이 브라우저의 기록은 가져온 기록으로 바뀌어요.</b></p><label class="mv-file"><input type="file" id="mvFile" accept="application/json,.json,text/plain,.txt"><span>파일 고르기</span></label><textarea id="mvTxt" class="gear-in mv-ta" rows="3" placeholder="HWK로 시작하는 기록 키"></textarea><small id="mvMsg"></small></div>',
+    [{id:'mvcancel',label:'취소',grow:1,fn:()=>{}},{id:'mvgo',label:'가져오기',primary:true,grow:1,fn:async()=>{const r=mvData?{o:mvData}:await mvParseAny(mvTxt);
+      if(!r.o){toast(mvErr(r));track('import_fail',{err:r.err,len:String(mvTxt||'').length});return}
+      HW_RAW.set('liftlog.import',JSON.stringify(r.o.data));setTimeout(()=>location.reload(),200)}}])}
 document.getElementById('sheet').addEventListener('input',e=>{if(e.target.id==='mvTxt')mvTxt=e.target.value});
 document.getElementById('sheet').addEventListener('change',e=>{if(e.target.id!=='mvFile')return;const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();
-  r.onload=()=>{mvData=mvParse(r.result);const m=document.getElementById('mvMsg');if(m)m.textContent=mvData?'파일을 읽었어요 · '+mvData.at.slice(0,10)+' 내보낸 기록':'hardwrk 기록 파일이 아니에요';if(m)m.className=mvData?'ok':'bad'};r.readAsText(f)});
+  r.onload=async()=>{const x=await mvParseAny(r.result);mvData=x.o||null;const m=document.getElementById('mvMsg');if(m)m.textContent=mvData?'파일을 읽었어요 · '+String(mvData.at||'').slice(0,10)+' 내보낸 기록':'hardwrk 기록 파일이 아니에요';if(m)m.className=mvData?'ok':'bad'};r.readAsText(f)});
 /* v61: 내 전용 — 코치를 안 거친 기존 루틴도 공유용과 같은 [내 운동 조건]·[루틴 수정하기]를 쓰도록 지금 루틴과 조건을 코치에 미리 넣어요 */
 function ensureSeed(){if(HW_TEST||typeof CO==='undefined'||!CO)return;CO.profile=CO.profile||{};if(CO.profile.goal&&CO.plan)return;
   if(!CO.profile.goal)Object.assign(CO.profile,{name:'재홍',goal:'근육 늘리며 체지방 줄이기',exp:'3년 이상',days:'주 3회',time:'90분 이상',gym:'머신 많은 큰 헬스장',focus:['가슴','팔'],exclude:['없어요'],parts:'3부위',emph:['가슴 상부'],avoid:'카프 레이즈·복근 운동은 빼 주세요',cardio:'주 1회',body:'건너뛸게요',current:'하체+가슴 / 등+어깨 / 하체+가슴+팔 3분할'});
@@ -3266,7 +3395,7 @@ document.getElementById('sheet').addEventListener('click',e=>{if(!e.target.close
 function coEditInputs(){if(coBusy)return;reOpen({cond:true})}
 function renderHome(){
   let h='<div class="brand"><span class="br-sp" aria-hidden="true"></span><span class="br-logo" aria-label="hardwrk">hardwrk</span><button class="br-add" data-add="'+TODAY+'" aria-label="기록 추가"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4.5v15M4.5 12h15"/></svg></button></div>'+homeHero();
-  h+=weekOverview(false,true)+goalView()+'<p class="credit">Directed by Jaehong Ahn'+''+'</p>';
+  h+=weekOverview(false,true)+goalView()+'<p class="credit">Butter Lab</p>';
   return h}
 /* ---------- v25: 다음 운동 추천 (주간 남은 일정 최적화) ----------
    기준(재홍 확정): 순서·횟수 우선(루틴1→2→3 + 러닝1회/주), 웨이트 연속 금지, 하체 루틴 간 48시간,
@@ -3373,7 +3502,7 @@ const addBtn=ds=>ds<=TODAY?'<button class="sec-act add" data-add="'+ds+'">+ 기�
 function openAddSheet(ds){const o=recordsOn(ds),done=new Set(o.s.map(x=>x.day));let nx=suggestNext(ds),chip='이번 루틴';
   if(ds===TODAY&&(sessions.length||runs.length)){const A=nextAdvice();if(A.today&&A.today.a!=='rest'){nx=A.today.a;chip='오늘 추천'}}
   const pre=(nx==='run'?!!o.r:(done.has(nx)||!!weekDone(ds)[nx]))?null:nx;sheetPick=pre;
-  const body='<div class="pick" role="radiogroup"><div class="pk-l sm"><h3>웨이트</h3><span>'+ORDER.map(x=>x.slice(1)).join(' → ')+' 순서대로</span></div>'+ORDER.map(id=>{const wd=weekDone(ds)[id],dis=!done.has(id)&&!!wd;return pickRow(id,PROGRAM[id].title,done.has(id)?'이 날짜에 기록됨 · 선택하면 수정':dis?'이번 주 '+short(wd)+' ('+dowOf(wd)+') 완료':rSub(PROGRAM[id]),ds===TODAY&&id===liveId()?'<em>진행 중</em>':id===nx&&!done.has(id)&&!dis?'<em>'+chip+'</em>':dis?'<em class="done">완료</em>':'',id===pre&&!dis,dis)}).join('')+'<div class="pk-l sm"><h3>러닝</h3><span>쉬는 날 자유롭게 · 주 1회</span></div>'+pickRow('run','러닝 5km',o.r?'이 날짜에 기록됨 · 선택하면 수정':'편한 페이스 · '+durText('run'),nx==='run'&&!o.r?'<em>'+chip+'</em>':'',pre==='run')+'</div>';
+  const body='<div class="pick" role="radiogroup"><div class="pk-l sm"><h3>웨이트</h3><span>'+ORDER.map(x=>x.slice(1)).join(' → ')+' 순서대로</span></div>'+ORDER.map(id=>{const wd=weekDone(ds)[id],dis=!done.has(id)&&!!wd;return pickRow(id,PROGRAM[id].title,done.has(id)?'이 날짜에 기록됨 · 누르면 수정':dis?'이번 주 '+short(wd)+' ('+dowOf(wd)+') 완료':rSub(PROGRAM[id]),ds===TODAY&&id===liveId()?'<em>진행 중</em>':id===nx&&!done.has(id)&&!dis?'<em>'+chip+'</em>':dis?'<em class="done">완료</em>':'',id===pre&&!dis,dis)}).join('')+'<div class="pk-l sm"><h3>러닝</h3><span>쉬는 날 자유롭게 · 주 1회</span></div>'+pickRow('run','러닝 5km',o.r?'이 날짜에 기록됨 · 누르면 수정':'편한 페이스 · '+durText('run'),nx==='run'&&!o.r?'<em>'+chip+'</em>':'',pre==='run')+'</div>';
   showSheet(ds===TODAY?'오늘 운동 시작하기':short(ds)+' '+dowOf(ds)+'요일 기록 추가',body,pickActions(id=>openEdit(id,ds)));if(!sheetPick){const ok=document.querySelector('[data-sheet="pickok"]');if(ok)ok.disabled=true}}
 function openEdit(t,ds){
   state.confirmDel=false;state.modePicked=true;
@@ -3513,7 +3642,7 @@ app.addEventListener('click',async e=>{const ag=e.target.closest('[data-advgo]')
   if(b.dataset.rvopen!=null){rvOpen();return}
   if(b.dataset.dayopen!=null){if(b.dataset.dayopen)openDaySheet(b.dataset.dayopen);return}
   if(b.dataset.addex!=null){addOpen();return}
-  if(b.dataset.addrm){addRemove(b.dataset.addrm);return}
+  if(b.dataset.addrm){const k=b.dataset.addrm;swGuard(k,'빼기',()=>addRemove(k));return}
   if(b.dataset.celre){const o=recordsOn(TODAY);if(b.dataset.celre==='w'&&o.s.length){CEL={kind:'w',S:celFromSession(o.s[o.s.length-1]),view:'det'};celShow()}else if(o.r){celRun({date:o.r.date,km:o.r.km,sec:o.r.sec,cond:o.r.cond})}return}
   if(b.dataset.ssx){ssPick(b.dataset.ssx);return}
   if(b.dataset.ssxoff){ssOff(b.dataset.ssxoff);return}
@@ -3522,8 +3651,8 @@ app.addEventListener('click',async e=>{const ag=e.target.closest('[data-advgo]')
   if(b.dataset.droff){const k=b.dataset.droff;delete curDraft(k).drops;render();schedPersist();toast('드롭세트를 되돌렸어요');return}
   if(b.dataset.dchk){dropChk(b.dataset.dchk,+b.dataset.i);return}
   if(b.dataset.gearm){gearSheet(b.dataset.gearm);return}
-  if(b.dataset.swap){swOpen(b.dataset.swap);return}
-  if(b.dataset.swback){swBack(b.dataset.swback);return}
+  if(b.dataset.swap){const k=b.dataset.swap;swGuard(k,'바꾸기',()=>swOpen(k));return}
+  if(b.dataset.swback){const k=b.dataset.swback;swGuard(k,'되돌리기',()=>swBack(k));return}
   if(b.dataset.wuadd){const k=b.dataset.wuadd,dv=curDraft(k),inc=+b.dataset.inc,top=parseFloat(dv.sets[0]&&dv.sets[0].w);dv.wu=dv.wu||[];
     const plan=[[.5,10],[.7,5],[.85,3]][Math.min(dv.wu.length,2)];
     dv.wu.push({w:top>0?fmt(roundTo(top*plan[0],inc)):'',r:String(plan[1])});render();
@@ -3544,8 +3673,8 @@ function showSheet(title,body,actions,headAct){
   el.hidden=false;sheetHandlers=Object.fromEntries(actions.map(a=>[a.id,a.fn]));
   requestAnimationFrame(()=>el.querySelector('.sp')?.focus())}
 let sheetHandlers={};
-function hideSheet(){const el=document.getElementById('sheet');el.hidden=true;el.innerHTML=''}
-document.getElementById('sheet').addEventListener('click',e=>{const pk=e.target.closest('[data-pick]');if(pk){sheetPick=pk.dataset.pick;pk.parentNode.querySelectorAll('[data-pick]').forEach(r=>{const on=r===pk;r.classList.toggle('sel',on);r.setAttribute('aria-checked',on)});const ok=document.querySelector('[data-sheet="pickok"]');if(ok)ok.disabled=false;return}
+function hideSheet(){const el=document.getElementById('sheet');el.hidden=true;el.innerHTML='';el.classList.remove('over')}
+document.getElementById('sheet').addEventListener('click',e=>{const pk=e.target.closest('[data-pick]');if(pk){if(pk.getAttribute('aria-disabled')==='true')return;const g=sheetGo;sheetGo=null;hideSheet();if(g)g(pk.dataset.pick);return}
   const ad=e.target.closest('[data-add]');if(ad){hideSheet();openAddSheet(ad.dataset.add);return}
   const a=e.target.closest('[data-edit],[data-receipt]');if(a){hideSheet();if(a.dataset.receipt)openReceipt(a.dataset.receipt,a.dataset.date);else openEdit(a.dataset.edit,a.dataset.date);return}
   const b=e.target.closest('[data-sheet]');if(!b)return;const id=b.dataset.sheet;hideSheet();if(id!=='close'&&sheetHandlers[id])sheetHandlers[id]()});
@@ -3755,7 +3884,11 @@ app.addEventListener('focusin',e=>{const c=e.target.closest&&e.target.closest('.
 
 
 /* ---------- v8: 운동 영수증 (투명 PNG) ---------- */
-let DL=null;(async()=>{try{DL=await window.claude?.use?.('downloads')}catch(e){DL=null}if(DL)render()})();
+/* v91: 배포 버전(브라우저)에서는 휴대폰 공유 시트 또는 파일 다운로드로 저장 */
+const HW_DL={save:async({filename,data})=>{const f=new File([data],filename,{type:data.type||'application/octet-stream'});
+  if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)&&navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f]});return{status:'saved'}}catch(e){if(e&&e.name==='AbortError'){const x=new Error('declined');x.code='declined';throw x}}}
+  const u=URL.createObjectURL(data),a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return{status:'saved'}}};
+let DL=window.claude?null:HW_DL;(async()=>{if(!window.claude)return;try{DL=await window.claude.use('downloads')}catch(e){DL=null}if(DL)render()})();
 const RCPT={met:5,defKg:72};
 function bodyKgOn(ds){const b=body.filter(x=>x.date<=ds).sort((a,c)=>a.date<c.date?1:-1)[0];if(b)return b.kg;const i=inbody.filter(x=>x.date<=ds).sort((a,c)=>a.date<c.date?1:-1)[0];return i?i.weight:RCPT.defKg}
 function receiptData(day,date){const s=sessionFor(date,day);if(!s)return null;let vol=0,n=0,reps=0;
@@ -4291,7 +4424,7 @@ $co('coach').addEventListener('click',e=>{if(!CP)return;const b=e.target.closest
   if(d.cpok!=null){if(CP.multi.length)cpSet(CP.multi.slice());return}
   if(d.cptxt!=null){const v=(document.getElementById('cpIn')||{}).value||'';if(!v.trim()){toast('내용을 적거나 아래 버튼을 골라 주세요');return}cpSet(v.trim())}},true);
 $co('coach').addEventListener('keydown',e=>{if(!CP)return;if(e.key==='Escape'){CP=null;cpRefresh()}else if(e.key==='Enter'&&e.target.id==='cpIn'&&!e.isComposing){e.preventDefault();document.querySelector('[data-cptxt]')?.click()}});
-function coOpen(onboard){coOnboard=!!onboard;coAnchorI=-1;const el=$co('coach');el.hidden=false;document.body.style.overflow='hidden';
+function coOpen(onboard){coOnboard=!!onboard;coAnchorI=-1;const el=$co('coach');el.hidden=false;{const ci=$co('coImp');if(ci)ci.hidden=!(coOnboard&&!CO.plan&&!Object.keys(CO.profile||{}).length)}document.body.style.overflow='hidden';
   $co('coClose').hidden=coOnboard;$co('coEnd').hidden=true;setTimeout(coRsBtn,0);
   if(!CO.msgs.length&&!CO.plan)coAsk(0);else{if(CO.step==='confirm')CO.step='chat';if(CO.edit){CO.edit=false;CO.step=CO.back||'review'}coRenderAll();coDock()}
   track('coach_open',{onboard:coOnboard?1:0})}
