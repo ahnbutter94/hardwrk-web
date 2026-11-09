@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1B1C1E"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><!-- HW:META 테스트용 — 운영(index.html) 배포 때 이 블록을 운영용으로 바꿔요 -->
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1B1C1E"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><!-- HW:META 운영용 -->
 <meta name="apple-mobile-web-app-title" content="hardwrk">
 <title>hardwrk</title>
 <meta name="description" content="운동 기록과 증량 관리를 한곳에서. 지난 기록을 보고 오늘 할 운동과 목표 무게를 알려줘요.">
@@ -2210,6 +2210,8 @@ body.bars-off .wrap>.brand:not(.co-brand){transform:translateY(calc(-100% - env(
 .pwa-st b,.pwa-warn b{font-weight:700;font-size:inherit!important;line-height:inherit!important;color:inherit;display:inline}
 .mv-ok{display:flex;align-items:center;gap:8px;font-size:14px;line-height:20px;color:var(--ink-2)}
 .mv-ok b{color:#2FD3B5;font-weight:700}
+/* v100: 상단 로고 줄을 화면 끝까지(사진 히어로처럼 좌우 -20px) — 좌우에 사진·내용이 비쳐 보이던 문제 */
+.wrap>.brand:not(.co-brand){margin-left:-20px!important;margin-right:-20px!important;padding-left:20px!important;padding-right:20px!important}
 </style>
 
 <div class="tbar" id="tbar" hidden><span>테스트 중이에요. 내 기록은 따로 그대로 있어요.</span><button id="tbarEnd" type="button">테스트 끝내기</button></div>
@@ -3573,6 +3575,16 @@ function ctaHTML(){const run=state.mode==='run',d=run?state.runDate:state.logDat
   return'<div class="cta-wrap"><button class="cta" id="cta"'+(!db||readOnly?' disabled':'')+'>'+t+'</button></div>'}
 
 document.querySelector('.tabbar').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  /* v102: 이미 선택된 탭을 다시 누르면 — 운동 탭은 진행 중 운동이면 지금 하는 종목으로, 2뎁스면 운동 탭 메인으로, 메인이면 맨 위로. 다른 탭은 맨 위로 */
+  if(b.dataset.main===state.main){const sm=!matchMedia('(prefers-reduced-motion:reduce)').matches?'smooth':'auto';
+    if(state.main==='work'){
+      if(isPastView()){leavePast(()=>{state.modePicked=false;state.confirmDel=false;render();window.scrollTo({top:0})});return}
+      const lid=liveId();
+      if(lid&&state.modePicked&&state.mode===lid&&state.logDate===TODAY){const k=liveCur(lid).k;if(state.openK!==k||!document.getElementById('card-'+k)){state.openK=k;state.activeK=k;render()}if(!scrollActive(sm==='smooth'))window.scrollTo({top:0,behavior:sm});return}
+      if(state.modePicked){state.modePicked=false;state.confirmDel=false;render();window.scrollTo({top:0});return}
+    }
+    if(!isPastView()){window.scrollTo({top:0,behavior:sm});return}
+  }
   /* v52: 지난 기록 보는 중 화면을 옮기면 — 고친 값 없으면 바로 이동, 있으면 물어봐요 */
   if(isPastView()){const to=b.dataset.main;leavePast(()=>{state.main=to;render();window.scrollTo({top:0})});return}
   if(state.main!==b.dataset.main)state.pvOpen=new Set();state.main=b.dataset.main;state.confirmDel=false;
@@ -4780,4 +4792,93 @@ setInterval(()=>{if(state.main==='record'&&!editing())render()},60000);
 </script>
 
 
+<style id="hw-v101">
+/* v101: 상단 로고 줄 두껍게(52px) */
+.wrap>.brand:not(.co-brand){height:52px!important}
+.wrap>.brand:not(.co-brand) .br-logo{font-size:22px!important}
+.wrap>.brand:not(.co-brand) .br-add{width:40px!important;height:40px!important;margin:0 -8px 0 0!important}
+.wrap>.brand:not(.co-brand) .br-add svg{width:24px!important;height:24px!important}
+/* v101: 하단 탭 얇게(64 → 52px, 유튜브 기준) */
+:root{--tabbar:76px!important}
+.tabbar div{height:52px!important;padding:4px!important}
+.tabbar button{gap:1px!important;line-height:13px}
+.tabbar button svg{width:22px!important;height:22px!important}
+
+body.bars-off .wrap>.brand:not(.co-brand){transform:none}
+/* v101: 상단 로고 줄 — 로고 왼쪽, 스크롤에 손가락처럼 따라 움직임(유튜브식) */
+.wrap>.brand:not(.co-brand){grid-template-columns:1fr 36px!important;transition:none!important}
+.wrap>.brand:not(.co-brand) .br-sp{display:none}
+.wrap>.brand:not(.co-brand) .br-logo{justify-self:start;transform-origin:left center}
+.wrap>.brand:not(.co-brand)>*{transition:opacity .12s linear}
+/* v101: 하단 탭 — 가운데는 맑게, 테두리로 갈수록 번지고 밝게(리퀴드 글라스 근사) */
+.tabbar::before{background:none!important}
+.tabbar div{background:rgba(24,25,28,.34)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:0!important;
+  box-shadow:inset 1.2px 1.2px 0 rgba(255,255,255,.34),inset -1px -1px 0 rgba(255,255,255,.14),inset 0 0 0 .5px rgba(255,255,255,.10),inset 0 0 18px rgba(255,255,255,.05),0 10px 28px rgba(0,0,0,.38)!important}
+.tabbar div::before,.tabbar div::after{content:""!important;position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1}
+.tabbar div::before{-webkit-backdrop-filter:blur(1.2px) saturate(140%) brightness(.82);backdrop-filter:blur(1.2px) saturate(140%) brightness(.82)}
+.tabbar div::after{-webkit-backdrop-filter:blur(7px) saturate(230%) brightness(1.4);backdrop-filter:blur(7px) saturate(230%) brightness(1.4);
+  -webkit-mask-image:linear-gradient(to bottom,#000,rgba(0,0,0,.55) 7px,transparent 15px,transparent calc(100% - 15px),rgba(0,0,0,.55) calc(100% - 7px),#000),linear-gradient(to right,#000,rgba(0,0,0,.55) 10px,transparent 24px,transparent calc(100% - 24px),rgba(0,0,0,.55) calc(100% - 10px),#000);
+  mask-image:linear-gradient(to bottom,#000,rgba(0,0,0,.55) 7px,transparent 15px,transparent calc(100% - 15px),rgba(0,0,0,.55) calc(100% - 7px),#000),linear-gradient(to right,#000,rgba(0,0,0,.55) 10px,transparent 24px,transparent calc(100% - 24px),rgba(0,0,0,.55) calc(100% - 10px),#000)}
+.tabbar button{text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.tabbar button svg{filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}
+.tabbar button[aria-selected="true"]{background:rgba(255,255,255,.16)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.18)!important}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.tabbar div{background:rgba(40,41,45,.97)!important}}
+@media (prefers-reduced-transparency:reduce){.tabbar div{background:#2E2F33!important}.tabbar div::before,.tabbar div::after{content:none!important}}
+</style>
+<script>
+/* v101: 상단 로고 줄 — 내린 만큼 올라가고, 올린 만큼 내려와요. 손을 떼면 반 이상 숨었으면 숨김, 아니면 다시 보임 */
+(function(){let ly=Math.max(0,scrollY),off=0,el=null,t=0;
+  const get=()=>document.querySelector('.wrap>.brand:not(.co-brand)');
+  const H=()=>(el?el.offsetHeight:40)+6;
+  const paint=anim=>{if(!el)return;el.style.transition=anim?'transform .22s cubic-bezier(.2,.9,.3,1)':'none';el.style.transform=off?'translateY('+(-off)+'px)':'';const o=String(Math.max(0,1-off/(H()*.7)));for(const c of el.children)c.style.opacity=o};
+  addEventListener('scroll',()=>{const n=get();if(n!==el){el=n;off=0}if(!el)return;
+    if(document.body.style.overflow==='hidden')return;
+    const y=Math.max(0,scrollY),d=y-ly;ly=y;const h=H();
+    off=Math.min(h,Math.max(0,off+d));if(off>y)off=y;paint(false);
+    clearTimeout(t);t=setTimeout(()=>{if(off>0&&off<h){off=(off>h/2&&scrollY>h)?h:0;paint(true)}},140)},{passive:true});
+  addEventListener('click',e=>{if(e.target.closest('.tabbar button')){off=0;el=get();paint(true)}},true);
+})();
+</script>
+<style id="hw-v102">
+/* v102: 하단 탭 — 선택 탭은 색 대신 면(채운 아이콘·흰색), 선택 표시 알약은 하나로 미끄러지며 늘어났다 줄어듦 */
+.tabbar div{position:relative}
+.tabbar button{position:relative;z-index:1}
+.tabbar button[aria-selected="true"]{background:transparent!important;box-shadow:none!important;color:#fff!important;font-weight:700}
+.tabbar button[aria-selected="false"]{color:rgba(247,247,248,.82)!important}
+.tabbar button .ic-f{display:none}
+.tabbar button[aria-selected="true"] .ic-o{display:none}
+.tabbar button[aria-selected="true"] .ic-f{display:block}
+.tabbar .tb-ind{position:absolute;top:4px;bottom:4px;left:var(--l,4px);right:var(--r,4px);z-index:0;border-radius:999px;pointer-events:none;
+  background:rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+  transition:left .36s cubic-bezier(.3,1.25,.5,1),right .36s cubic-bezier(.3,1.25,.5,1),transform .3s cubic-bezier(.3,1.4,.5,1),background .3s}
+.tabbar .tb-ind.go-r{transition-duration:.42s,.26s,.3s,.3s;transition-delay:.04s,0s,0s,0s}
+.tabbar .tb-ind.go-l{transition-duration:.26s,.42s,.3s,.3s;transition-delay:0s,.04s,0s,0s}
+.tabbar .tb-ind.mv{transform:scaleY(.86);background:rgba(255,255,255,.24)}
+.tabbar .tb-ind.no-t{transition:none!important}
+@media (prefers-reduced-motion:reduce){.tabbar .tb-ind{transition:none!important}}
+</style>
+<script>
+/* v102: 채운 아이콘 + 미끄러지는 선택 알약 */
+(function(){const F={
+  home:'<path d="M3.6 10.3 11.1 4.2a1.4 1.4 0 0 1 1.8 0l7.5 6.1V19a1.9 1.9 0 0 1-1.9 1.9H15v-5.6a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5.6H5.5A1.9 1.9 0 0 1 3.6 19z" fill="currentColor"/>',
+  work:'<rect x="4.8" y="5.2" width="3.6" height="13.6" rx="1.4" fill="currentColor"/><rect x="15.6" y="5.2" width="3.6" height="13.6" rx="1.4" fill="currentColor"/><rect x="1.8" y="8.4" width="2.6" height="7.2" rx="1.1" fill="currentColor"/><rect x="19.6" y="8.4" width="2.6" height="7.2" rx="1.1" fill="currentColor"/><rect x="8" y="10.8" width="8" height="2.4" fill="currentColor"/>',
+  cal:'<defs><mask id="hwCalM"><rect width="24" height="24" fill="#fff"/><rect x="2" y="9.2" width="20" height="1.6" fill="#000"/></mask></defs><path mask="url(#hwCalM)" fill="currentColor" d="M8 2.2a1 1 0 0 1 1 1V4h6v-.8a1 1 0 1 1 2 0V4h.5A3.5 3.5 0 0 1 21 7.5v10A3.5 3.5 0 0 1 17.5 21h-11A3.5 3.5 0 0 1 3 17.5v-10A3.5 3.5 0 0 1 6.5 4H7v-.8a1 1 0 0 1 1-1Z"/>',
+  record:'<path d="M4 19h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M5 17.2v-1.6l4.3-4.3a1 1 0 0 1 1.4 0L13 13.6l4.6-5.5a1 1 0 0 1 1.7.6v8.5Z" fill="currentColor"/>'};
+  const bar=document.querySelector('.tabbar div');if(!bar)return;
+  bar.querySelectorAll('button[data-main]').forEach(b=>{const o=b.querySelector('svg');if(!o||b.querySelector('.ic-f'))return;o.classList.add('ic-o');
+    const k=b.dataset.main;if(!F[k])return;const f=document.createElementNS('http://www.w3.org/2000/svg','svg');f.setAttribute('viewBox','0 0 24 24');f.setAttribute('class','ic-f');f.setAttribute('aria-hidden','true');f.innerHTML=F[k];o.after(f)});
+  const ind=document.createElement('i');ind.className='tb-ind no-t';ind.setAttribute('aria-hidden','true');bar.prepend(ind);
+  let cur=null,tm=0;
+  const place=anim=>{const b=bar.querySelector('button[aria-selected="true"]');if(!b){ind.style.opacity='0';return}ind.style.opacity='';
+    const W=bar.clientWidth,l=b.offsetLeft,r=W-(b.offsetLeft+b.offsetWidth);
+    if(!anim||!cur){ind.classList.add('no-t');ind.style.setProperty('--l',l+'px');ind.style.setProperty('--r',r+'px');void ind.offsetWidth;ind.classList.remove('no-t');cur=b;return}
+    if(b===cur)return;const right=b.offsetLeft>cur.offsetLeft;cur=b;
+    ind.classList.toggle('go-r',right);ind.classList.toggle('go-l',!right);ind.classList.add('mv');
+    ind.style.setProperty('--l',l+'px');ind.style.setProperty('--r',r+'px');
+    clearTimeout(tm);tm=setTimeout(()=>ind.classList.remove('mv'),200)};
+  new MutationObserver(()=>place(true)).observe(bar,{subtree:true,attributes:true,attributeFilter:['aria-selected']});
+  addEventListener('resize',()=>place(false));
+  requestAnimationFrame(()=>place(false));
+})();
+</script>
 </body></html>
