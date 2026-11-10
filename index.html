@@ -1,8 +1,10 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#1B1C1E"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="hardwrk">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#1B1C1E"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><!-- HW:META 운영용 -->
+<meta name="apple-mobile-web-app-title" content="hardwrk">
 <title>hardwrk</title>
 <meta name="description" content="운동 기록과 증량 관리를 한곳에서. 지난 기록을 보고 오늘 할 운동과 목표 무게를 알려줘요.">
 <meta property="og:title" content="hardwrk">
-<meta property="og:description" content="운동 기록과 증량 관리를 한곳에서. 지난 기록을 보고 오늘 할 운동과 목표 무게를 알려줘요."><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta property="og:description" content="운동 기록과 증량 관리를 한곳에서. 지난 기록을 보고 오늘 할 운동과 목표 무게를 알려줘요.">
+<!-- /HW:META --><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: phone-first single column, max 520px. 기록 = 아침 체중 → 현황 3지표 → AI 요약 → 근력/체성분/러닝 드릴다운. 식단 = 지금 먹을 것 → 하루 목표 → 흐름 → 규칙(접힘). Fixed full-width CTA above the tab bar. Light only. */
@@ -2919,7 +2921,7 @@ const rvMk=(MN,i,n)=>MN&&MN[i]?MN[i][coNorm(PRESS_RN(n))]||'':'';
 function rvViewInner(){const MN=rvMine(),P=progPlan(),DW=['월','화','수','목','금','토','일'],sch=(PROG_META&&Array.isArray(PROG_META.schedule)?PROG_META.schedule:[]).map((c,i)=>({day:DW[i],c,plan:c==='run'?'러닝':PROGRAM[c]?PROGRAM[c].label:'휴식'})),V=vVolume(P),g=p=>(V.find(v=>v.part===p)||{}).sets||0,ps=PARTS5.filter(g);
   const days=sch.map(d=>{const c=coCell(d.plan),dl=String(d.day||'').slice(0,1);return'<li aria-label="'+esc(mrDay(d.day))+' '+c[1]+'"><span class="d" aria-hidden="true">'+esc(dl)+'</span><span class="p'+(c[0]==='c'?' c':c[0]?'':' off')+'" aria-hidden="true">'+c[1]+'</span></li>'}).join('');
   let h='<header class="fp-hd"><button class="fp-x" type="button" data-fpx aria-label="뒤로">'+BACKI+'</button><h1 id="fpT">내 루틴</h1></header><div class="mr-sc rv-sc">';
-  h+='<section class="mr-hero">'+(PROG_META&&PROG_META.title?'<h2>'+esc(PROG_META.title)+'</h2>':'<h2>이번 주 루틴</h2>')+'</section>';/* v91: 요일 표 삭제(v84·v88) */
+  h+='<section class="mr-hero">'+'<h2>'+esc(hwTitle(progPlan(),(typeof CO!=='undefined'&&CO&&CO.profile)||{})||'이번 주 루틴')+'</h2>'+'</section>';/* v91: 요일 표 삭제(v84·v88) */
   /* v85: 내 루틴 — 루틴 상자는 항상 펼쳐요. 부위는 왼쪽에 한 번만(연속된 같은 부위끼리 묶음), 운동 순서는 그대로 */
   const rvCov=(t,p)=>t.includes(p)||(SUBS[p]||[]).some(x=>t.includes(x.split(' ')[0]));
   P.routines.forEach(r=>{const t=String(r.title||''),dd=sch.filter(d=>d.c===r.id).map(d=>mrDay(d.day)).join('·'),ts=r.exercises.reduce((a,e)=>a+(+e.sets||0),0);
@@ -3354,7 +3356,7 @@ let mvChkT=0;document.getElementById('sheet').addEventListener('input',e=>{if(e.
 function ensureSeed(){if(HW_TEST||typeof CO==='undefined'||!CO)return;CO.profile=CO.profile||{};if(CO.profile.goal&&CO.plan)return;
   if(!CO.profile.goal)Object.assign(CO.profile,{name:'재홍',goal:'근육 늘리며 체지방 줄이기',exp:'3년 이상',days:'주 3회',time:'90분 이상',gym:'머신 많은 큰 헬스장',focus:['가슴','팔'],exclude:['없어요'],parts:'3부위',emph:['가슴 상부'],avoid:'카프 레이즈·복근 운동은 빼 주세요',cardio:'주 1회',body:'건너뛸게요',current:'하체+가슴 / 등+어깨 / 하체+가슴+팔 3분할'});
   if(!CO.plan){const st=(PROG_META&&PROG_META.schedule)||['run','d1','rest','d2','rest','d3','rest'],D=['월','화','수','목','금','토','일'];
-    CO.plan={title:(PROG_META&&PROG_META.title)||'하체·가슴 우선 3분할',summary:'',schedule:D.map((d,i)=>({day:d,plan:st[i]==='run'?'러닝':st[i]==='rest'?'휴식':PROGRAM[st[i]]?PROGRAM[st[i]].label:'휴식'})),
+    CO.plan={title:(PROG_META&&PROG_META.title)||'',summary:'',schedule:D.map((d,i)=>({day:d,plan:st[i]==='run'?'러닝':st[i]==='rest'?'휴식':PROGRAM[st[i]]?PROGRAM[st[i]].label:'휴식'})),
       routines:ORDER.map(id=>{const P=PROGRAM[id],ex=P.items.map(it=>{const k=pick(it.k,'A');return{name:NAMES[k]||pick(it.n,'A'),part:it.part,sets:it.sets,reps:String(tgt(k)),technique:'',alt:'',tip:''}});return{name:P.label,focus:P.title,minutes:10+3*ex.reduce((a,e)=>a+e.sets,0),exercises:ex}}),
       volume:[],progression:[],rationale:[],caution:[]};CO.applied=JSON.stringify(CO.plan);CO.step='chat'}
   try{coSave()}catch(e){}}
@@ -4143,6 +4145,14 @@ const vMin=r=>10+3*(r.exercises||[]).reduce((a,e)=>a+(+e.sets||0),0);
 function vStats(plan){const part={},sub={};(plan.routines||[]).forEach((r,ri)=>(r.exercises||[]).forEach(e=>{const p=vMain(typeof coPart==='function'?coPart(e.part):e.part),s=vSub(e),n=+e.sets||0;
   const o=part[p]||(part[p]={sets:0,days:new Set()});o.sets+=n;o.days.add(ri);sub[p+'|'+s]=(sub[p+'|'+s]||0)+n}));return{part,sub}}
 function vVolume(plan){const st=vStats(plan);return Object.entries(st.part).map(([p,o])=>({part:p,sets:o.sets,freq:o.days.size}))}
+/* v109: 루틴 제목은 저장값이 아니라 규칙으로 — ① 우선 부위 설정(최대 2개, 루틴에 있는 부위만) ② 없으면 주간 볼륨이 부위 평균보다 많은 부위(많은 순, 최대 2개) ③ '골고루'면 '균형' · 분할 수 = 루틴 수 */
+function hwTitle(plan,pf){const R=plan&&Array.isArray(plan.routines)?plan.routines:[],n=R.length;if(!n)return'';
+  let V=[];try{V=vVolume(plan).filter(v=>v.sets>0)}catch(e){}
+  const has=new Set(V.map(v=>v.part)),OR=['가슴','등','어깨','팔','하체'],raw=Array.isArray(pf&&pf.focus)?pf.focus:[],even=raw.includes('골고루');
+  let pri=[...new Set(raw.filter(x=>x&&x!=='골고루'&&x!=='없어요').map(x=>coPart(x)))].filter(p=>has.has(p));
+  if(!pri.length&&!even&&V.length>1){const avg=V.reduce((a,v)=>a+v.sets,0)/V.length;pri=V.filter(v=>v.sets>avg).sort((a,b)=>b.sets-a.sets||OR.indexOf(a.part)-OR.indexOf(b.part)).map(v=>v.part)}
+  pri=pri.slice(0,2);const sp=n<2?'무분할':n+'분할';
+  return pri.length?pri.join('·')+' 우선 '+sp:even?'균형 '+sp:sp}
 function vEmphSubs(pf){const e=Array.isArray(pf&&pf.emph)?pf.emph:[];return e.map(x=>EMPH2SUB[x]).filter(Boolean)}
 /* 세부 부위별 '모자람' — 균등이 기본, 강조한 세부 부위는 2배 몫 */
 function vNeed(plan,pf,part){const st=vStats(plan),em=vEmphSubs(pf);return (PARTSUB[part]||[]).map(s=>({s,sets:st.sub[part+'|'+s]||0,w:em.includes(s)?2:1})).map(x=>({...x,r:x.sets/x.w}))}
@@ -4234,7 +4244,7 @@ function coSumHTML(p,live){
 function coCell(v){v=String(v||'');if(!v||v.includes('휴식'))return['','휴식'];if(/러닝|유산소/.test(v))return['c','러닝'];const m=v.match(/\d+/);return['w',m?'루틴 '+m[0]:'웨이트']}
 function coPlanHTML(P,i,rev){const R=Array.isArray(P.routines)?P.routines:[],lp=CO.msgs.map((x,j)=>x.kind==='plan'?j:-1).filter(j=>j>-1).pop(),live=i===lp&&!P.__cur,days=(Array.isArray(P.schedule)?P.schedule:[]).filter(d=>coCell(d.plan)[0]==='w').length;
   /* v79: 대화창에는 요약만 — 종목 확인·수정은 [내 루틴 확인] 화면에서 */
-  return '<div class="co-card co-pc"><div class="co-ch"><span class="k">'+(P.__cur?'지금 쓰는 루틴':rev?'수정한 루틴':'맞춤 루틴')+'</span><h3>'+esc(P.title||'주간 루틴')+'</h3><p>루틴 '+R.length+'개'+(days?' · 주 '+days+'회':'')+'<br>'+R.map((r,k)=>(k+1)+'. '+esc(r.focus||r.name)).join(' · ')+'</p></div>'+'<div class="co-cf"><button class="co-btn" data-co="copy-plan" data-i="'+i+'" type="button">텍스트로 복사</button></div></div>'}
+  return '<div class="co-card co-pc"><div class="co-ch"><span class="k">'+(P.__cur?'지금 쓰는 루틴':rev?'수정한 루틴':'맞춤 루틴')+'</span><h3>'+esc(hwTitle(P,CO.profile||{})||P.title||'주간 루틴')+'</h3><p>루틴 '+R.length+'개'+(days?' · 주 '+days+'회':'')+'<br>'+R.map((r,k)=>(k+1)+'. '+esc(r.focus||r.name)).join(' · ')+'</p></div>'+'<div class="co-cf"><button class="co-btn" data-co="copy-plan" data-i="'+i+'" type="button">텍스트로 복사</button></div></div>'}
 function coPlanReady(rev){coAnsRefresh();coAdd({kind:'plan',data:CO.plan,revised:rev});coAdd({kind:'bot',text:'종목과 세트는 [내 루틴 확인]에서 바로 고칠 수 있어요.'+(CO.applied?' [이 루틴으로 시작하기]를 누르기 전까지는 지금 루틴 그대로예요.':'')+'\n운동 조건이나 목표를 바꾸고 싶으면 여기서 말해 주세요.'});setTimeout(mrOpen,MRB?Math.max(150,2000-(Date.now()-MRB.t0)):150)}
 function coRow(m,i){const h=coBubble(m,i);return i===coAnchorI?h.replace('<div class="co-row','<div data-anchor="1" class="co-row'):h}
 function coRenderAll(){$co('coLog').innerHTML=CO.msgs.map(coRow).join('');coScroll()}
@@ -4376,7 +4386,7 @@ function localPlan(pf){
   [6,2,5,4,1].filter(d=>sch[d]==='휴식').slice(0,runN).forEach(d=>sch[d]='러닝');
   plan.schedule=D.map((d,i)=>({day:d,plan:sch[i]}));
   const ex=exParts(pf),em=Array.isArray(pf.emph)?pf.emph:[];
-  plan.title='주 '+nR+'회 · 하루 '+k+'부위'+(focus.length?' · '+focus.slice(0,2).join('·')+' 우선':'');
+  plan.title=hwTitle(plan,pf);
   const mx=Math.max(...plan.routines.map(r=>r.minutes));
   plan.summary='주 '+nR+'회, 하루 '+k+'부위씩 회당 약 '+mx+'분으로 짰어요. 해 보면서 조건이나 부위별 볼륨을 바꾸면 다시 맞춰요.';
   plan.progression=['모든 세트가 목표 반복을 채우면 다음 회차에 증량 (하체 +5kg, 상체 최소 단위)','못 채우면 같은 무게로 한 번 더','6~8주마다 1주는 세트를 절반으로 줄이는 디로드'];
@@ -4416,7 +4426,7 @@ function toProgram(P,prof){const routines={},order=[],leg={},reps={},used=new Se
     routines[id]={label:'루틴 '+(i+1),title:String(r.focus||parts.join(' + ')),main:[...new Set(pri.length?pri:parts)].slice(0,2),items};
     if(parts.includes('하체'))leg[id]=true});
   const sched=(P.schedule||[]).slice(0,7).map(d=>{const v=String(d.plan||'');if(/러닝|유산소/.test(v))return'run';const m=v.match(/\d+/);return m&&routines['d'+m[0]]?'d'+m[0]:'rest'});
-  return{v:1,routines,order,leg,reps,schedule:sched.length===7?sched:null,name:String(prof.name||''),title:String(P.title||''),run:String(prof.cardio||''),savedAt:new Date().toISOString()}}
+  return{v:1,routines,order,leg,reps,schedule:sched.length===7?sched:null,name:String(prof.name||''),title:String(hwTitle(P,prof||{})||P.title||''),run:String(prof.cardio||''),savedAt:new Date().toISOString()}}
 function coApply(){if(!coValid(CO.plan))return;coPending=toProgram(CO.plan,CO.profile);
   const hasOwn=!HW_TEST&&(sessions.length||runs.length||PROG_SAVED);
   if(hasOwn){CO.step='confirm';coAdd({kind:'bot',head:true,text:'지금 쓰는 루틴을 이 루틴으로 바꿀까요?\n지난 운동 기록은 그대로 남아요. 이름이 같은 종목은 지난 무게를 이어서 추천해요.'});coDock();return}
@@ -4475,7 +4485,7 @@ function coClose(force){if(coBusy&&!force)return;if(coOnboard&&!force)return;if(
 function coRsBtn(){const b=$co('coRs');if(b)b.hidden=!(coOnboard&&!CO.applied&&CO.msgs.some(x=>x.kind==='user'))}
 function coRestart(){if(coBusy)return;CO=coFresh();coMulti=[];$co('coLog').innerHTML='';coAsk(0)}
 async function coCopy(text,btn){const old=btn.textContent;try{await navigator.clipboard.writeText(text);btn.textContent='복사했어요'}catch(e){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');btn.textContent='복사했어요'}catch(_){btn.textContent='복사하지 못했어요'}ta.remove()}setTimeout(()=>{btn.textContent=old},1800)}
-function coPlanText(P){let t=(P.title||'주간 루틴')+'\n'+(P.summary||'')+'\n\n[주간 스케줄]\n'+(P.schedule||[]).map(d=>d.day+' '+d.plan).join(' / ')+'\n';
+function coPlanText(P){let t=(hwTitle(P,CO.profile||{})||P.title||'주간 루틴')+'\n'+(P.summary||'')+'\n\n[주간 스케줄]\n'+(P.schedule||[]).map(d=>d.day+' '+d.plan).join(' / ')+'\n';
   (P.routines||[]).forEach((r,k)=>{t+='\n[루틴 '+(k+1)+'] '+(r.focus||'')+' · 약 '+(r.minutes||'')+'분\n';(r.exercises||[]).forEach(e=>{t+='- '+e.name+' '+e.sets+'×'+e.reps+(e.technique?' ('+e.technique+')':'')+(e.alt?' / 대체: '+e.alt:'')+'\n'})});
   if(P.progression)t+='\n[증량 규칙]\n'+P.progression.map(x=>'- '+x).join('\n')+'\n';return t+'\n— hardwrk 루틴 코치'}
 
@@ -4514,14 +4524,14 @@ function mrBridgeHide(){clearInterval(mrBridgeShow.t);if(!MRB)return;MRB=null;if
 function mrOpen(live){if(!coValid(CO.plan))return;clearInterval(mrBridgeShow.t);MRB=null;
   if(!(CO.mrDraft&&CO.mrBase&&JSON.stringify(mrClean(CO.mrDraft))===JSON.stringify(CO.plan))){CO.mrBase=mrIds(CO.plan);CO.mrDraft=vClone(CO.mrBase);coSave()}
   {const wasA=!!CO.applied&&JSON.stringify(CO.plan)===CO.applied;mrGrp(CO.mrDraft);const np=mrClean(CO.mrDraft);if(JSON.stringify(np)!==JSON.stringify(CO.plan)){CO.plan=np;if(wasA)CO.applied=JSON.stringify(np);coSave()}}
-  MR={open:{0:true},ex:null,vopen:false,live:!!live,last:live?vClone(CO.mrDraft):null};const el=$mr();el.hidden=false;document.body.classList.add('mr-on');mrRender(true);track('mr_open',{})}
+  MR={open:{0:true},ex:null,vopen:false,live:!!live,last:live?vClone(CO.mrDraft):null,lastF:JSON.stringify((CO.profile||{}).focus||null),prevD:vClone(CO.mrDraft)};const el=$mr();el.hidden=false;document.body.classList.add('mr-on');mrRender(true);track('mr_open',{})}
 function mrClose(quiet){if(!MR)return;hwUTHide();if(MR.live)quiet=true;MR=null;MS=null;const el=$mr();el.hidden=true;el.innerHTML='';document.body.classList.remove('mr-on');if(!quiet&&!$co('coach').hidden)coDock()}
 function mrCommit(){mrGrp(CO.mrDraft);vFinish(CO.mrDraft);CO.plan=mrClean(CO.mrDraft);coSave();if(MR&&MR.live)hwLiveCommit();mrRender()}
 /* v108: 내 루틴 바로 반영 — 고칠 때마다 저장. 진행 중인 오늘 운동이 있으면 끝난 뒤 반영(HW_PEND). 되돌리기 토스트는 같은 종목 연속 조절을 하나로 묶음 */
 const HW_UT={snap:null,key:null,t:0};
 function hwLiveCommit(undo){const key=MR.key||('k'+Date.now());MR.key=null;
-  if(!undo){if(!(HW_UT.t&&HW_UT.key===key))HW_UT.snap=MR.last;HW_UT.key=key}
-  MR.last=vClone(CO.mrDraft);
+  if(!undo){if(!(HW_UT.t&&HW_UT.key===key)){HW_UT.snap=MR.last;HW_UT.fsnap=MR.lastF}HW_UT.key=key}
+  MR.last=vClone(CO.mrDraft);MR.lastF=JSON.stringify((CO.profile||{}).focus||null);
   const P=toProgram(CO.plan,CO.profile||{});if(PROG_META){P.title=P.title||PROG_META.title||'';P.run=P.run||PROG_META.run||'';if(!P.schedule&&PROG_META.schedule)P.schedule=PROG_META.schedule}if(!P.name&&typeof USER_NAME==='string')P.name=USER_NAME;
   CO.applied=JSON.stringify(CO.plan);coSave();
   if(liveId()){HW_PEND=P;try{localStorage.setItem(HW_PEND_KEY,JSON.stringify(P))}catch(e){}}else hwSaveProg(P);
@@ -4531,7 +4541,7 @@ async function hwSaveProg(P){try{if(db&&!readOnly){if(PROG_SAVED)await db.doc('p
   catch(e){HW_PEND=P;toast('루틴을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.');return}
   applyProgram(P);PROG_SAVED=JSON.stringify(P);try{localStorage.removeItem(HW_PEND_KEY)}catch(e){}render()}
 function hwUTShow(m,canUndo){let el=document.getElementById('utoast');if(!el){el=document.createElement('div');el.id='utoast';el.className='utoast';el.setAttribute('role','status');document.body.appendChild(el);
-    el.addEventListener('click',e=>{if(!e.target.closest('[data-utundo]')||!MR||!HW_UT.snap)return;CO.mrDraft=vClone(HW_UT.snap);HW_UT.snap=null;HW_UT.key=null;MR.ex=null;hwUTHide();mrGrp(CO.mrDraft);vFinish(CO.mrDraft);CO.plan=mrClean(CO.mrDraft);coSave();hwLiveCommit(true);mrRender()})}
+    el.addEventListener('click',e=>{if(!e.target.closest('[data-utundo]')||!MR||!HW_UT.snap)return;if(HW_UT.fsnap!=null&&CO.profile){const f=JSON.parse(HW_UT.fsnap);if(f==null)delete CO.profile.focus;else CO.profile.focus=f}HW_UT.fsnap=null;CO.mrDraft=vClone(HW_UT.snap);HW_UT.snap=null;HW_UT.key=null;MR.ex=null;hwUTHide();mrGrp(CO.mrDraft);vFinish(CO.mrDraft);CO.plan=mrClean(CO.mrDraft);coSave();hwLiveCommit(true);mrRender()})}
   el.innerHTML='<span>'+esc(m)+'<small>다음 운동부터 반영돼요</small></span>'+(canUndo&&HW_UT.snap?'<button type="button" data-utundo>되돌리기</button>':'');
   const ft=document.querySelector('#mr .mr-ft');el.style.bottom=(ft?Math.max(16,innerHeight-ft.getBoundingClientRect().top+8):24)+'px';el.hidden=false;
   clearTimeout(HW_UT.t);HW_UT.t=setTimeout(hwUTHide,4000)}
@@ -4559,7 +4569,7 @@ function mrRender(top){if(!MR)return;const el=$mr(),sc=el.querySelector('.mr-sc'
   /* 입력값은 루틴 만들기 전에 확정 — 처음 루틴을 만들 땐 뒤로 가기 없이 [시작하기]로만 나가요. 이미 쓰는 루틴이 있을 때만 닫기 */
   let h=MR.live?'<header class="mr-hd"><button class="fp-x" type="button" data-mrx aria-label="뒤로">'+BACKI+'</button><h1>내 루틴</h1><span></span></header><div class="mr-sc">':'<header class="mr-hd"><span></span><h1>내 루틴 확인</h1>'+(CO.applied?'<button class="fp-x" type="button" data-mrx aria-label="닫기"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>':'<span></span>')+'</header><div class="mr-sc">';
   /* v91: 요일 표 삭제(v84·v88 — 요일 배정 없이 루틴 순서와 직전 기록으로 진행) */
-  h+=MR.live?'<section class="mr-hero"><h2>'+esc(P.title||'이번 주 루틴')+'</h2></section>':'<section class="mr-hero"><h2>'+(same?'지금 쓰는 루틴이에요':CO.applied?'새 루틴이 나왔어요':(pf.name?esc(pf.name)+'님 ':'')+'맞춤 루틴이 나왔어요')+'</h2>'+(P.title?'<p>'+esc(P.title)+'</p>':'')+'</section>';
+  h+=MR.live?'<section class="mr-hero"><h2>'+esc(hwTitle(P,pf)||P.title||'이번 주 루틴')+'</h2></section>':'<section class="mr-hero"><h2>'+(same?'지금 쓰는 루틴이에요':CO.applied?'새 루틴이 나왔어요':(pf.name?esc(pf.name)+'님 ':'')+'맞춤 루틴이 나왔어요')+'</h2>'+(P.title?'<p>'+esc(P.title)+'</p>':'')+'</section>';
   h+=n?'<div class="mrx-ed"><span>'+(MR.live?'처음 추천에서 '+n+'곳 바꿨어요':n+'곳 수정했어요')+'</span><button type="button" data-mrundo>되돌리기</button></div>':'<p class="mrx-hint"><b aria-hidden="true">✦</b> 종목을 누르면 세트·횟수를 바꾸거나 다른 종목으로 바꿀 수 있어요</p>';
   /* v91: 내 루틴(v85)과 같은 구성 — 상자 항상 펼침, 연속된 같은 부위는 왼쪽에 한 번만, 운동 순서 유지 */
   const cov=(t,p)=>t.includes(p)||(SUBS[p]||[]).some(x=>t.includes(x.split(' ')[0]));
@@ -4618,7 +4628,7 @@ $mr().addEventListener('click',e=>{if(!MR){if(e.target.closest('[data-mrbx]')&&c
   if(d.mrsw){mrPick('sw',d.mrsw);return}
   if(d.mrdel){const f=mrFind(d.mrdel);if(!f||f.r.exercises.length<=1)return;f.r.exercises.splice(f.ei,1);MR.ex=null;toast(f.e.name+josa(f.e.name,'을','를')+' 뺐어요');mrCommit();return}
   if(d.mradd!=null){mrPick('add',+d.mradd);return}
-  if(d.mrundo!=null){const n=mrCount();showSheet('처음 추천으로 되돌릴까요?','<div class="cond-ask"><p>'+(MR.live?'처음 추천에서 바꾼 ':'이 화면에서 바꾼 ')+n+'곳이 모두 원래대로 돌아가요.</p></div>',[{id:'mrun',label:'취소',grow:1,fn:()=>{}},{id:'mruy',label:'되돌리기',primary:true,grow:1.6,fn:()=>{if(!MR)return;CO.mrDraft=vClone(CO.mrBase);MR.ex=null;if(MR.live){MR.msg='처음 추천으로 되돌렸어요';mrCommit();return}CO.plan=mrClean(CO.mrBase);coSave();mrRender();toast('처음 추천으로 되돌렸어요')}}]);return}
+  if(d.mrundo!=null){const n=mrCount();showSheet('처음 추천으로 되돌릴까요?','<div class="cond-ask"><p>'+(MR.live?'처음 추천에서 바꾼 ':'이 화면에서 바꾼 ')+n+'곳이 모두 원래대로 돌아가요.</p></div>',[{id:'mrun',label:'취소',grow:1,fn:()=>{}},{id:'mruy',label:'되돌리기',primary:true,grow:1.6,fn:()=>{if(!MR)return;CO.mrDraft=vClone(CO.mrBase);MR.ex=null;if(MR.live){MR.msg='처음 추천으로 되돌렸어요';MR.fAuto=true;mrCommit();return}CO.plan=mrClean(CO.mrBase);coSave();mrRender();toast('처음 추천으로 되돌렸어요')}}]);return}
   if(d.mrv!=null){MR.vopen=!MR.vopen;mrRender();return}
   if(d.mrvol!=null){MR.vopen=false;mrRender();volOpen('mr');return}
   if(d.mrgo!=null)mrStart()});
@@ -5007,4 +5017,105 @@ html,body{touch-action:manipulation}
 .utoast span{flex:1;min-width:0}.utoast small{display:block;color:#5A5C63;font-size:12px;line-height:16px;font-weight:500}
 .utoast button{flex:none;height:32px;padding:0 12px;border:0;border-radius:8px;background:rgba(0,0,0,.08);color:var(--bg);font:inherit;font-size:14px;font-weight:700;cursor:pointer}
 </style>
+<style id="hw-v109">
+/* v109: 로고를 글자 → 벡터 그림(기울기 포함)으로 — 아이폰에서 기울인 글자가 흐리게 그려지던 문제 */
+:root{--hwlogo:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='72 -1760 7414 1776'><path d='M72 0 446 -1760H814L727 -1351Q774 -1435 843 -1476Q911 -1516 991 -1516Q1147 -1516 1197 -1418Q1248 -1320 1213 -1155L967 0H605L846 -1132Q856 -1181 842 -1212Q828 -1243 784 -1243Q747 -1243 719 -1211Q691 -1179 681 -1135L440 0ZM1428 16Q1303 16 1250 -42Q1196 -100 1194 -201Q1191 -302 1219 -430Q1248 -567 1293 -654Q1339 -742 1416 -798Q1494 -854 1617 -893L1855 -969L1888 -1123Q1914 -1244 1835 -1244Q1763 -1244 1742 -1146L1723 -1056H1375Q1375 -1064 1378 -1076Q1381 -1089 1384 -1105Q1432 -1329 1557 -1422Q1682 -1516 1911 -1516Q2031 -1516 2117 -1474Q2203 -1431 2241 -1348Q2279 -1265 2253 -1143L2010 0H1654L1692 -178Q1646 -84 1575 -34Q1505 16 1428 16ZM1628 -262Q1672 -262 1696 -299Q1720 -336 1729 -379L1818 -797Q1737 -767 1687 -722Q1636 -676 1617 -588L1576 -395Q1548 -262 1628 -262ZM2199 0 2518 -1500H2882L2847 -1333Q2891 -1420 2968 -1469Q3044 -1518 3144 -1518L3081 -1219Q3037 -1219 2973 -1210Q2910 -1200 2861 -1184Q2811 -1167 2807 -1147L2563 0ZM3252 16Q3148 16 3095 -22Q3042 -60 3027 -127Q3011 -194 3020 -284Q3030 -374 3052 -477L3191 -1129Q3227 -1302 3312 -1409Q3396 -1516 3543 -1516Q3652 -1516 3700 -1470Q3749 -1423 3763 -1340L3853 -1760H4217L3843 0H3479L3512 -159Q3465 -78 3406 -31Q3346 16 3252 16ZM3449 -264Q3500 -264 3526 -305Q3552 -346 3575 -452L3709 -1083Q3720 -1136 3716 -1188Q3711 -1239 3658 -1239Q3600 -1239 3575 -1190Q3549 -1141 3537 -1083L3403 -452Q3363 -264 3449 -264ZM4189 0 4327 -1500H4634L4561 -694L4820 -1500H5163L5094 -694L5349 -1500H5657L5155 0H4778L4851 -851L4576 0ZM5509 0 5828 -1500H6192L6156 -1333Q6201 -1420 6277 -1469Q6354 -1518 6454 -1518L6390 -1219Q6346 -1219 6283 -1210Q6220 -1200 6171 -1184Q6121 -1167 6117 -1147L5873 0ZM6270 0 6644 -1760H6998L6833 -983L7115 -1500H7486L7122 -848L7228 0H6847L6774 -707L6624 0Z'/></svg>")}
+.br-logo,.brand span.br-logo{display:block;width:3.620em;height:0.867em;color:transparent!important;transform:none!important;letter-spacing:0!important;overflow:hidden;background:var(--ink);-webkit-mask:var(--hwlogo) no-repeat 0 0/100% 100%;mask:var(--hwlogo) no-repeat 0 0/100% 100%}
+.br-logo{position:relative;left:.12em}
+.wrap>.brand:not(.co-brand) .br-logo{left:-.045em}
+.hw-hap{position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden}
+</style>
+<script>
+/* v109: 햅틱 — 안드로이드는 navigator.vibrate, 아이폰(iOS 18+)은 숨긴 스위치를 눌러 시스템 햅틱. 안 되면 조용히 무시 */
+(function(){
+  const iOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  let lb=null;
+  const tap=()=>{try{if(!lb){lb=document.createElement('label');lb.className='hw-hap';lb.setAttribute('aria-hidden','true');const i=document.createElement('input');i.type='checkbox';i.setAttribute('switch','');i.tabIndex=-1;lb.appendChild(i);['click','change'].forEach(t=>lb.addEventListener(t,e=>e.stopPropagation()));document.body.appendChild(lb)}lb.click()}catch(e){}};
+  window.hwHaptic=p=>{if(!iOS){try{navigator.vibrate&&navigator.vibrate(p==null?20:p)}catch(e){}return}
+    const a=Array.isArray(p)?p:[p==null?20:p];let t=0;for(let k=0;k<a.length;k+=2){if(t)setTimeout(tap,t);else tap();t+=(a[k]||0)+(a[k+1]||0)}};
+  /* 아이폰에는 vibrate가 없어서 기존 진동(운동 완료 등)이 울리지 않았음 → 같은 장치로 연결 */
+  if(iOS&&typeof navigator.vibrate!=='function'){try{navigator.vibrate=p=>{window.hwHaptic(p);return true}}catch(e){}}
+  /* 당겨서 새로고침: 새로고침이 걸리는 순간(손을 뗄 때) 한 번. 조건·거리 계산은 기존 당겨서 새로고침과 같게 */
+  let y0=null,d=0;
+  document.addEventListener('touchstart',e=>{y0=(typeof state!=='undefined'&&state.main==='home'&&window.scrollY<=0&&!document.querySelector('.sheet.open'))?e.touches[0].clientY:null;d=0},{passive:true});
+  document.addEventListener('touchmove',e=>{if(y0==null)return;d=Math.max(0,(e.touches[0].clientY-y0)*.5)},{passive:true});
+  document.addEventListener('touchend',()=>{if(y0==null)return;y0=null;if(d>=60)window.hwHaptic(15)},{passive:true});
+})();
+</script>
+<style id="hw-v110">
+/* v110: 우선 부위 자동 맞춤 안내 줄 — 내 루틴 '처음 추천에서 N곳 바꿨어요' 줄과 같은 형식 */
+.mrx-ed.hw-fn b{color:var(--ink-1,#f7f7f8);font-weight:600}
+.mrx-ed.hw-fn button{flex-shrink:0;white-space:nowrap}
+.mrx-ed.hw-fn span{min-width:0}
+.cond-ask .hw-fb{font:inherit;font-weight:700;color:var(--ink-1,#f7f7f8)}
+</style>
+<script>
+/* v110: 우선 부위 = 주간 볼륨 비중 (2026-11-10 재홍 확정)
+   - 직접 세트 많은 부위 최대 2개. 팔만 계산에서 이두·삼두로 나눠 셈(화면 표기는 '팔')
+   - 세트가 같으면 지금 우선 부위 유지(1세트라도 많아야 바뀜)
+   - 상위 2개가 바뀌어 설정과 어긋나는 수정 → 확인 시트 1회. [바꾸기] = 루틴 저장 + 우선 부위 자동 갱신 / [취소]·닫기 = 수정 안 함
+   - 되돌리기 토스트·처음 추천으로 되돌리기는 우선 부위도 함께. 종목 순서는 바꾸지 않음
+   - '골고루'는 가장 많은 단위가 평균의 1.3배 이상일 때만 어긋남
+   - 배포 시 이미 어긋난 사용자는 내 루틴을 처음 열 때 자동으로 맞추고 한 줄로 안내(1회) */
+(function(){
+  const OR=['가슴','등','어깨','팔','하체'];
+  const ro=w=>{const c=String(w).slice(-1).charCodeAt(0);if(c>=0xAC00&&c<=0xD7A3){const j=(c-0xAC00)%28;return j===0||j===8?'로':'으로'}return'로'};
+  const fArr=pf=>Array.isArray(pf&&pf.focus)?pf.focus:[];
+  const fParts=f=>[...new Set(f.filter(x=>x&&x!=='골고루'&&x!=='없어요').map(x=>vMain(coPart(x))))];
+  function calc(plan,cur){const u={};
+    ((plan&&plan.routines)||[]).forEach(r=>(r.exercises||[]).forEach(e=>{const p=vMain(coPart(e.part)),n=+e.sets||0;if(!n||!OR.includes(p))return;const k=p==='팔'?'팔|'+(vSub(e)==='삼두'?'삼두':vSub(e)==='이두'?'이두':'기타'):p;u[k]=(u[k]||0)+n}));
+    const cp=cur||[],L=Object.entries(u).map(([k,n])=>({k,p:k.split('|')[0],n})).sort((a,b)=>b.n-a.n||(cp.includes(b.p)-cp.includes(a.p))||OR.indexOf(a.p)-OR.indexOf(b.p));
+    const top=[];for(const x of L){if(!top.includes(x.p))top.push(x.p);if(top.length===2)break}return{top,L}}
+  /* 어긋나면 새 우선 부위 배열, 맞으면 null */
+  function next(plan,pf){const f=fArr(pf);if(!f.length)return null;
+    const even=f.includes('골고루'),cur=fParts(f),R=calc(plan,cur);if(!R.top.length)return null;
+    if(even){if(!R.L.length)return null;const pv={};R.L.forEach(x=>{(pv[x.p]=pv[x.p]||[]).push(x.n)});const vs=Object.values(pv).map(a=>a.reduce((s,n)=>s+n,0)/a.length),avg=vs.reduce((a,n)=>a+n,0)/vs.length;return R.L[0].n>=avg*1.3?R.top.slice():null}
+    if(!cur.length)return null;const k=Math.min(2,cur.length),t=R.top.slice(0,k);
+    if(t.every(p=>cur.includes(p)))return null;
+    /* 원래 고른 이름 유지(엉덩이 → 하체 등) */
+    return t.map(p=>f.find(x=>x!=='골고루'&&vMain(coPart(x))===p)||p)}
+  const lbl=a=>fParts(a).join('·');
+  window.hwFocusCalc=calc;window.hwFocusNext=next;
+  /* 우선 부위 설정이 없으면 제목도 같은 계산(팔은 이두·삼두로 나눠 셈) — 평균보다 많은 부위, 최대 2개 */
+  const _ht=hwTitle;hwTitle=function(plan,pf){const f=fArr(pf);if(f.length)return _ht(plan,pf);const n=((plan&&plan.routines)||[]).length;if(!n)return'';
+    const R=calc(plan,[]);if(R.L.length<2)return _ht(plan,pf);const avg=R.L.reduce((a,x)=>a+x.n,0)/R.L.length,pri=[];R.L.filter(x=>x.n>avg).forEach(x=>{if(!pri.includes(x.p)&&pri.length<2)pri.push(x.p)});
+    const sp=n<2?'무분할':n+'분할';return pri.length?pri.join('·')+' 우선 '+sp:sp};
+
+  const _mc=mrCommit;let FQ=null;
+  function cancel(){if(!MR)return;FQ=null;if(MR.prevD)CO.mrDraft=vClone(MR.prevD);MR.ex=null;MR.msg=null;MR.key=null;mrRender();toast('바꾸지 않았어요');track('focus_sync_canceled',{})}
+  function done(){_mc();if(MR)MR.prevD=vClone(CO.mrDraft)}
+  function setF(nf,msg){const pf=CO.profile||(CO.profile={});pf.focus=nf;coSave();
+    if(MR&&MR.live)MR.msg=msg;else toast(msg)}
+  mrCommit=function(){if(!MR||!CO.mrDraft){_mc();return}
+    const pf=CO.profile||{},B=CO.plan;mrGrp(CO.mrDraft);vFinish(CO.mrDraft);const A=mrClean(CO.mrDraft);
+    const nA=next(A,pf);
+    if(MR.fAuto){MR.fAuto=false;if(nA)setF(nA,'처음 추천으로 되돌렸어요 · 우선 부위 '+lbl(nA));done();return}
+    if(!nA){done();return}
+    const nB=next(B,pf),cur=fParts(fArr(pf));
+    const tB=calc(B,cur).top.join(),tA=calc(A,cur).top.join();
+    if(nB&&tB===tA){done();return}  /* 이미 어긋나 있고 순위가 그대로면 묻지 않음 */
+    const L=lbl(nA),even=fArr(pf).includes('골고루');
+    FQ={ok:false};hwUTHide();
+    showSheet('우선 부위가 바뀌어요','<div class="cond-ask"><p>이렇게 바꾸면 주간 볼륨이 가장 많은 부위가 <span class="hw-fb">'+esc(L)+'</span>'+josa(L,'이','가')+' 돼요. 우선 부위도 '+(even?"'골고루'에서 ":'')+esc(L)+ro(L)+' 바꿀게요.</p></div>',
+      [{id:'hwfn',label:'취소',grow:1,fn:()=>{if(FQ)FQ.ok=true;cancel()}},
+       {id:'hwfy',label:'바꾸기',primary:true,grow:1.6,fn:()=>{if(FQ)FQ.ok=true;FQ=null;setF(nA,'우선 부위를 '+L+ro(L)+' 바꿨어요');track('focus_sync_confirmed',{});done()}}]);
+    track('focus_sync_asked',{})};
+  /* 배경·Esc로 닫으면 취소와 같게 */
+  const _hs=hideSheet;hideSheet=function(){_hs();if(FQ&&!FQ.ok){const q=FQ;setTimeout(()=>{if(FQ===q&&!q.ok)cancel()},0)}};
+
+  /* 배포 시 1회 맞춤 — 내 루틴을 처음 열 때 */
+  const _ro=rvOpen;rvOpen=function(){_ro();try{if(!MR||!MR.live||CO.fsync)return;CO.fsync=1;
+      const pf=CO.profile||{},n=next(CO.plan,pf);
+      if(n){CO.fnote={prev:JSON.stringify(pf.focus),now:lbl(n)};pf.focus=n;MR.lastF=JSON.stringify(n);track('focus_auto_migrated',{})}
+      coSave();mrRender()}catch(e){}};
+  const _mr=mrRender;mrRender=function(top){_mr(top);try{if(!MR||!MR.live||!CO.fnote)return;const el=$mr(),h=el&&el.querySelector('.mr-hero');if(!h||el.querySelector('.hw-fn'))return;
+      const d=document.createElement('div');d.className='mrx-ed hw-fn';d.innerHTML='<span>볼륨에 맞춰 우선 부위를 <b>'+esc(CO.fnote.now)+'</b>'+ro(CO.fnote.now)+' 바꿨어요</span><button type="button" data-hwfn>되돌리기</button>';h.after(d)}catch(e){}};
+  const _cl=mrClose;mrClose=function(q){if(CO&&CO.fnote){CO.fnote=null;coSave()}_cl(q)};
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-hwfn]');if(!b||!CO.fnote)return;
+    const f=JSON.parse(CO.fnote.prev||'null'),pf=CO.profile||(CO.profile={});if(f==null)delete pf.focus;else pf.focus=f;
+    if(MR)MR.lastF=JSON.stringify(f);CO.fnote=null;coSave();mrRender();toast('우선 부위를 되돌렸어요');track('focus_migrate_undone',{})});
+  /* 새로 루틴을 만든 사용자는 맞춤 대상 아님(처음 추천 = 지금 설정) */
+  const _st=mrStart;mrStart=function(){CO.fsync=1;coSave();_st()};
+})();
+</script>
 </body></html>
