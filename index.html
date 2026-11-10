@@ -5,6 +5,7 @@
 <meta property="og:title" content="hardwrk">
 <meta property="og:description" content="운동 기록과 증량 관리를 한곳에서. 지난 기록을 보고 오늘 할 운동과 목표 무게를 알려줘요.">
 <!-- /HW:META --><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: phone-first single column, max 520px. 기록 = 아침 체중 → 현황 3지표 → AI 요약 → 근력/체성분/러닝 드릴다운. 식단 = 지금 먹을 것 → 하루 목표 → 흐름 → 규칙(접힘). Fixed full-width CTA above the tab bar. Light only. */
@@ -2454,13 +2455,13 @@ function collapseOverview(anchorId){if(state.main!=='work'||!document.querySelec
   const n=document.getElementById(anchorId);if(n&&t!=null)window.scrollBy(0,n.getBoundingClientRect().top-t)}
 let sheetPick=null;
 function weekDone(ref){const ws=weekStart(ref||TODAY),we=addDays(ws,6),m={};sessions.filter(s=>s.date>=ws&&s.date<=we).sort((a,b)=>a.date<b.date?-1:1).forEach(s=>m[s.day]=s.date);return m}
-/* v91: 루틴 카드 공통 컴포넌트 — 운동 탭(남은·완료 루틴), 홈 [+] 오늘 운동 시작하기, 루틴 바꾸기 시트가 모두 이 함수 하나로 그려요.
+/* v91: 루틴 카드 공통 컴포넌트 — 운동 탭(남은·완료 루틴), 캘린더 기록 추가(v111: 홈 [+] 삭제), 루틴 바꾸기 시트가 모두 이 함수 하나로 그려요.
    kind: ''(기본) · 'rec'(오늘 추천, 가장 큼) · 'done'(완료, 가장 작음) / chip.k: fill=오늘 · tint=다음 차례 · ing=진행 중 · text=글자만 · done=완료 */
 function goRowHTML(txt){return '<span class="pk-go"><span>'+txt+'</span><b>시작하기<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></b></span>'}
 function rtCard(o){const run=o.id==='run',done=o.kind==='done',P=run?null:PROGRAM[o.id];
-  const ic='<span class="pk-ic">'+(done?CHECK:run?RUNI:DUMB)+(run?'':'<em>'+o.id.slice(1)+'</em>')+'</span>';
-  const m='<span class="pk-m"><strong>'+(P?'<span class="sr">'+P.label+' </span>':'')+esc(o.title)+'</strong>'+(o.sub&&!done?'<small>'+o.sub+'</small>':'')+'</span>';
-  const c=o.chip&&o.chip.t?'<span class="ov-st'+({fill:' next',tint:' rx-nx',ing:' next ing',done:' done',text:''}[o.chip.k]||'')+'">'+(o.chip.k==='done'?CHECK:'')+o.chip.t+'</span>':'';
+  const ic='<span class="pk-ln">'+(run?'러닝':P.label)+'</span>';/* v112: 번호 라벨 '루틴 N'·'러닝' — 홈 내 루틴과 같은 표기 */
+  const m='<span class="pk-m"><strong>'+esc(o.title)+'</strong>'+(o.sub&&!done?'<small>'+o.sub+'</small>':'')+'</span>';
+  const c=o.chip&&o.chip.t?'<span class="ov-st'+({fill:' next',tint:' rx-nx',ing:' next ing',done:' done',up:' up',text:''}[o.chip.k]||'')+'">'+(o.chip.k==='done'?CHECK:'')+o.chip.t+'</span>':'';
   return '<button type="button" class="pk-card'+(o.kind?' '+o.kind:'')+'" '+(o.attr||'')+(o.dis?' aria-disabled="true"':'')+'>'+ic+m+c+(o.kind==='rec'&&o.go?o.go:'')+'</button>'}
 let sheetGo=null;
 function pickRow(id,t,sub,chip,sel,dis){const txt=chip?chip.replace(/<[^>]+>/g,''):'';
@@ -2502,19 +2503,19 @@ function pickView(extra){
   const A=(sessions.length||runs.length)?nextAdvice():null,tg=A?A.tday:null,isRest=!!(tg&&tg.a==='rest'),isTd=!!(tg&&tg.date===TODAY),rec=tg?(isRest||!isTd?null:tg.a):suggestNext(),nxId=tg&&(isRest||!isTd)?(isRest?tg.nx:tg.a):null,nxTxt=tg&&!isRest&&!isTd?'내일 추천':'다음 차례',tw=tg?(tg.date===TODAY?'오늘':'내일')+' 추천':'이번 루틴',lid=liveId();
   const restNow=!lid&&isRest&&!!A.today,runIn=restNow&&tg.runOk;/* v88: 쉬는 날 카드 · 러닝은 카드 안 버튼으로 */
   const nd=new Set(wk.map(s=>s.day)).size;
-  let h='<section class="pk-top"><h1 class="pk-h">루틴을 골라 주세요'+helpBtn('work')+'</h1><p class="pk-s">이번 주 루틴 '+nd+' / '+ORDER.length+(runOff()?(wr.length?' · 러닝 '+wr.length+'회':''):' · 러닝 '+wr.length+' / 1')+'</p>'+helpPanel('work','<div class="list-card rules">'+HELP_WORK+'</div>')+'</section>'+sysBanners()+(extra||'');
+  let h='<section class="pk-top"><h1 class="pk-h">루틴을 골라 주세요'+helpBtn('work')+'</h1><p class="pk-s">이번 주 '+weekCountText(nd,wr.length)+'</p>'+helpPanel('work','<div class="list-card rules">'+HELP_WORK+'</div>')+'</section>'+sysBanners()+(extra||'');
   /* v49: 남은 루틴 · 완료 루틴 — 오늘 추천(가장 큼) > 남은 루틴 > 완료(가장 작음) */
   const goTxt=tw==='오늘 추천'?'지금 하기 좋은 루틴이에요':tw==='내일 추천'?'내일 하기 좋은 루틴이에요':'순서상 이번 차례예요';
   const goRow=goRowHTML(goTxt);
   const top=[],rest=[],fin=[];
   for(const id of ORDER){const p=PROGRAM[id],done=wk.filter(s=>s.day===id).map(s=>s.date).sort().pop(),n=id.slice(1);
     if(id===lid){const c=liveCur(id),pct=c.tot?Math.round(c.done/c.tot*100):0,pz=TM[TODAY+'_'+id].paused;
-      top.push('<button class="pk-card now" data-mode="'+id+'" aria-label="진행 중인 '+p.label+' '+esc(p.title)+'로 돌아가기"><span class="pk-ic">'+DUMB+'<em>'+n+'</em></span><span class="pk-m"><strong>'+esc(p.title)+'</strong><small>'+(pz?'일시정지 · ':'')+esc(c.name)+' · '+c.c+' / '+c.t+'세트</small></span><time id="pkT" class="num">'+hms(elapsed(TODAY+'_'+id)/1000)+'</time>'+
+      top.push('<button class="pk-card now" data-mode="'+id+'" aria-label="진행 중인 '+p.label+' '+esc(p.title)+'로 돌아가기"><span class="pk-ln">'+p.label+'</span><span class="pk-m"><strong>'+esc(p.title)+'</strong><small>'+(pz?'일시정지 · ':'')+esc(c.name)+' · '+c.c+' / '+c.t+'세트</small></span><time id="pkT" class="num">'+hms(elapsed(TODAY+'_'+id)/1000)+'</time>'+
         '<span class="pk-lv"><span class="pk-bar"><i style="width:'+pct+'%"></i></span><span class="pk-lt"><span>진행</span><span class="num">'+c.done+' / '+c.tot+'세트</span></span></span></button>');continue}
     if(done){fin.push({d:done,h:rtCard({id,title:p.title,kind:'done',chip:{k:'done',t:'완료'},attr:'data-mode="'+id+'"',dis:done!==TODAY})});continue}
     const isRec=id===rec&&!lid,draft=hasData(drafts[TODAY+'_'+id]);
     const isNx=!isRec&&id===nxId,ch=planChip(A,id);
-    const st=draft?{k:'ing',t:'진행 중'}:isRec?{k:'fill',t:tw}:isNx?{k:'tint',t:nxTxt}:ch?{k:'text',t:ch}:null;
+    const un=upCount(id),st=draft?{k:'ing',t:'진행 중'}:isRec?{k:'fill',t:tw}:isNx?{k:'tint',t:nxTxt}:un?{k:'up',t:'↑ 증량 '+un+'종목'}:ch?{k:'text',t:ch}:null;/* v112: 증량 칩 — 홈과 같은 우선순위 */
     (isRec?top:rest).push(rtCard({id,title:p.title,sub:p.items.length+'종목 · '+durText(id),kind:isRec?'rec':'',chip:st,attr:'data-mode="'+id+'"',go:goRow}))}
   const km=wr.reduce((a,r)=>a+r.km,0),rRec=!lid&&rec==='run';
   if(wr.length){const ld=wr.map(r=>r.date).sort().pop();fin.push({d:ld,h:rtCard({id:'run',title:'러닝 5km',kind:'done',chip:{k:'done',t:'완료'},attr:'data-mode="run"'})})}
@@ -2569,6 +2570,10 @@ function startHero(){
     '<div class="parts">'+Object.entries(ps).map(([p,v])=>'<span class="pp" style="'+pcSt(p)+'">'+p+' '+v.s+'세트</span>').join('')+'</div>'+
     '<div class="hr-first"><span>'+(live?'진행':'첫 종목')+'</span><b>'+(live?pr:esc(pick(it.n,cycle))+(ad.weight!=null?' · '+fmt(ad.weight)+'kg × '+tgt(k)+'회':' · 첫 기록'))+'</b></div>'+
     '<button class="btn-hero" data-mode="'+a+'">'+(live?'이어서 하기':'운동 시작')+'</button></section>'}
+/* v112: 이번 주 진행 카운트 — 홈 내 루틴·운동 탭 공통. 러닝은 따로 세요 */
+function weekCountText(n,rn){return '루틴 '+n+' / '+ORDER.length+(runOff()?(rn?' · 러닝 '+rn+'회':''):' · 러닝 '+rn+' / 1')}
+/* v112: 이번에 무게를 올릴 종목 수 — 홈·운동 탭 공통 */
+function upCount(id){const{cycle}=weekInfo(TODAY);let n=0;for(const it of PROGRAM[id].items){const k=pick(it.k,cycle);try{if(advise(k,it.sets,incOf(it,cycle),TODAY).kind==='up')n++}catch(e){}}return n}
 function planChip(A,id){return id==='run'?'쉬는 날에':''}/* v88: 요일 예정 칩 삭제 */
 function cycleView(){/* v77: 이번 주 — 번호 유지, 완료는 칩 + 흐리게, 추천 루틴은 파란 번호 + 오늘/내일 칩, 줄을 누르면 바로 들어가요 */
   const wd=weekDone(TODAY),ws=weekStart(TODAY),we=addDays(ws,6),wr=runs.filter(r=>r.date>=ws&&r.date<=we),rt=runOff()?0:runTarget(),T=ORDER.length,n=ORDER.filter(d=>wd[d]).length,rn=Math.min(wr.length,rt);
@@ -2578,12 +2583,12 @@ function cycleView(){/* v77: 이번 주 — 번호 유지, 완료는 칩 + 흐�
   const row=(id,ic,t,sub,done,dd)=>{const on=!done&&id===rec;return'<button class="ro'+(done?' done':'')+(on?' on':'')+'" type="button" '+(done?'data-dayopen="'+dd+'"':'data-mode="'+id+'"')+' aria-label="'+esc(t)+(done?' 완료 · 기록 보기':' 시작하기')+'"><span class="ro-n">'+ic+'</span><span class="ro-t"><b>'+esc(t)+'</b><small>'+sub+'</small></span>'+(done?'<i class="ro-c ok">완료</i>':on?'<i class="ro-c nx">'+recW+'</i>':id===nxR?'<i class="ro-c nx">다음 차례</i>':'')+'<span class="ro-ch" aria-hidden="true">'+CHEVR+'</span></button>'};
   const runToday=!!(ta&&ta.date===TODAY&&ta.a==='rest'&&ta.runOk&&ta.runPend);
   const{cycle}=weekInfo(TODAY),exS=id=>{const P=PROGRAM[id],ns=P.items.map(it=>{const k=pick(it.k,cycle);return NAMES[k]||pick(it.n,cycle)});return ns[0]+(ns.length>1?' 외 '+(ns.length-1)+'종목':'')};
-  const upN=id=>{let n=0;for(const it of PROGRAM[id].items){const k=pick(it.k,cycle);try{if(advise(k,it.sets,incOf(it,cycle),TODAY).kind==='up')n++}catch(e){}}return n};
+  const upN=upCount;
   const tlr=(id,ic,t,sub,done,dd)=>{const td=!done&&(id===rec&&recW==='오늘'||id==='run'&&runToday),nx=!done&&!td&&(id===nxR||(id===rec&&recW!=='오늘')),u=!done&&!td&&!nx&&id!=='run'?upN(id):0;
     const ch=done?'<i class="tl-c ok">'+CHECK+'완료</i>':td?'<i class="tl-c td">오늘</i>':nx?'<i class="tl-c nx">'+(id===rec&&recW==='내일'?'내일 추천':'다음 차례')+'</i>':u?'<i class="tl-c up">↑ 증량 '+u+'종목</i>':id==='run'?'<i class="tl-c">'+(rt?'주 '+rt+'회':'원할 때')+'</i>':'';
     return'<button class="tl-r'+(done?' done':'')+(td?' td':'')+'" type="button" '+(done?'data-dayopen="'+dd+'"':'data-mode="'+id+'"')+' aria-label="'+esc(t)+(done?' 완료 · 기록 보기':td?' · 오늘':'')+'"><span class="tl-n">'+ic+'</span><span class="tl-m"><b>'+esc(t)+'</b><small>'+esc(sub)+'</small></span>'+ch+'</button>'};
-  const rows=ORDER.map(id=>tlr(id,PROGRAM[id].label,PROGRAM[id].title,exS(id),!!wd[id],wd[id])).join('')+tlr('run','러닝','러닝 5km','편한 페이스 · '+durText('run'),rt?wr.length>=rt:false,wr.length?wr[wr.length-1].date:'');
-  return '<section class="wk-sec"><div class="sec-title"><h2>내 루틴 <span class="wk-n">이번 주 '+dn+' / '+tot+' 완료</span></h2><button class="ad-go mg-go" type="button" data-rvopen>자세히 보기'+CHEVR+'</button></div>'+
+  const rows=ORDER.map(id=>tlr(id,PROGRAM[id].label,PROGRAM[id].title,PROGRAM[id].items.length+'종목 · '+durText(id),!!wd[id],wd[id])).join('')+tlr('run','러닝','러닝 5km','편한 페이스 · '+durText('run'),rt?wr.length>=rt:false,wr.length?wr[wr.length-1].date:'');
+  return '<section class="wk-sec"><div class="sec-title"><h2>내 루틴 <span class="wk-n">'+weekCountText(n,wr.length)+'</span></h2><button class="ad-go mg-go" type="button" data-rvopen>자세히 보기'+CHEVR+'</button></div>'+
     '<div class="tlw"><span class="tl-rail" aria-hidden="true"></span>'+rows+'</div></section>'}
 /* v77: 홈 맨 위 — 인사 + 오늘의 코칭(라벨 › 내용 › 이번 주 루틴 순서) + 핵심 버튼 하나 */
 function coachBlock(label,body,chips){return'<div class="hc"><div class="hc-l"><span class="hc-ic" aria-hidden="true">✦</span><b>'+label+'</b></div><p class="hc-b">'+body+'</p>'+
@@ -3418,7 +3423,7 @@ document.getElementById('sheet').addEventListener('input',e=>{if(!gDraft)return;
 document.getElementById('sheet').addEventListener('click',e=>{if(!e.target.closest('[data-golink]'))return;hideSheet();gDraft=null;coEditInputs()});
 function coEditInputs(){if(coBusy)return;reOpen({cond:true})}
 function renderHome(){
-  let h='<div class="brand"><span class="br-sp" aria-hidden="true"></span><span class="br-logo" aria-label="hardwrk">hardwrk</span><button class="br-add" data-add="'+TODAY+'" aria-label="기록 추가"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4.5v15M4.5 12h15"/></svg></button></div>'+homeHero();
+  let h='<div class="brand"><span class="br-sp" aria-hidden="true"></span><span class="br-logo" aria-label="hardwrk">hardwrk</span></div>'+homeHero();/* v111: 홈 우상단 [+] 삭제 — 내 루틴 줄·운동 탭과 중복. 시트(openAddSheet)는 캘린더 기록 추가에서 계속 씀 */
   h+=weekOverview(false,true)+goalView()+'<p class="credit">Butter Lab</p>';
   return h}
 /* ---------- v25: 다음 운동 추천 (주간 남은 일정 최적화) ----------
@@ -4239,7 +4244,7 @@ function coSumHTML(p,live){
   const chg=p._changed,ed=p._ed||[],op=live&&CP&&CP.where==='sum'?CP.key:null;let h='<div class="co-card'+(live?'':' stale')+(op?' popopen':'')+'"'+(live?' id="coSumLive"':'')+'><div class="co-ch"><span class="k">'+(chg?(live?'바뀐 조건':'이전 조건'):(live?'입력 정리':'이전 입력'))+'</span><h3>'+(chg?'조건을 이렇게 바꿨어요':esc(p.name||'')+'님 정보로 루틴을 짤게요')+'</h3>'+(chg?'':live?'<p>바꿀 항목의 [수정]을 누르면 여기서 바로 고칠 수 있어요.</p>':'')+'</div><div class="co-kvl">';
   /* v78: 루틴 확정 후 수정 화면과 같은 방식 — 줄 아래 말풍선 팝오버에서 바로 고쳐요(대화는 늘지 않아요) */
   (chg?CQ.filter(q=>q.key===chg):CQ).forEach(q=>{const c=chg===q.key?' chg':'',o=op===q.key;
-    h+=live?'<div class="co-kvw'+(o?' on':'')+'"><button class="co-kvr'+c+(o?' on':'')+'" type="button" data-coedit="'+q.key+'"'+(coBusy?' disabled':'')+'><span class="kk">'+q.label+'</span><span class="vv">'+esc(coShow(q.key,p[q.key]))+(c?'<i class="co-new">변경</i>'+(p._prev!=null?'<small class="co-prev">이전 '+esc(p._prev)+'</small>':''):'')+(ed.includes(q.key)?'<i class="re-chg">수정됨</i>':(p._auto||[]).includes(q.key)?'<i class="re-chg auto">자동</i>':'')+'</span><span class="ed">'+(o?'수정 중':'수정')+'</span></button>'+(o?cpHTML(q):'')+'</div>':'<div class="co-kvr"><span class="kk">'+q.label+'</span><span class="vv">'+esc(coShow(q.key,p[q.key]))+'</span></div>'});
+    h+=live?'<div class="co-kvw'+(o?' on':'')+'"><button class="co-kvr'+c+(o?' on':'')+'" type="button" data-coedit="'+q.key+'"'+(coBusy?' disabled':'')+'><span class="kk">'+q.label+'</span><span class="vv">'+esc(coShow(q.key,p[q.key]))+(c?'<i class="co-new">수정됨</i>'+(p._prev!=null?'<small class="co-prev">이전 '+esc(p._prev)+'</small>':''):'')+(ed.includes(q.key)?'<i class="re-chg">수정됨</i>':(p._auto||[]).includes(q.key)?'<i class="re-chg auto">자동</i>':'')+'</span><span class="ed">'+(o?'수정 중':'수정')+'</span></button>'+(o?cpHTML(q):'')+'</div>':'<div class="co-kvr"><span class="kk">'+q.label+'</span><span class="vv">'+esc(coShow(q.key,p[q.key]))+'</span></div>'});
   return h+'</div>'+(live&&p._note?'<p class="co-cnote">'+esc(p._note)+'</p>':'')+'</div>'}
 function coCell(v){v=String(v||'');if(!v||v.includes('휴식'))return['','휴식'];if(/러닝|유산소/.test(v))return['c','러닝'];const m=v.match(/\d+/);return['w',m?'루틴 '+m[0]:'웨이트']}
 function coPlanHTML(P,i,rev){const R=Array.isArray(P.routines)?P.routines:[],lp=CO.msgs.map((x,j)=>x.kind==='plan'?j:-1).filter(j=>j>-1).pop(),live=i===lp&&!P.__cur,days=(Array.isArray(P.schedule)?P.schedule:[]).filter(d=>coCell(d.plan)[0]==='w').length;
@@ -5048,6 +5053,53 @@ html,body{touch-action:manipulation}
 .mrx-ed.hw-fn button{flex-shrink:0;white-space:nowrap}
 .mrx-ed.hw-fn span{min-width:0}
 .cond-ask .hw-fb{font:inherit;font-weight:700;color:var(--ink-1,#f7f7f8)}
+</style>
+<style id="hw-v112">
+/* v112: 칩 규칙(2026-11-10 재홍 확정) — 문서 '하드웍 v112 칩 규칙'
+   역할 5종: 상태 칩(24·12/700·반경8) / 표시 칩(20·12/700·반경6) / 번호 라벨(28·12/700·반경8) / 선택 칩(32·13/600·알약) / 부위 칩(예외)
+   색: 파랑 채움=지금 할 것(화면당 1) · 파랑 옅게=다음에 할 것(증량은 글자형) · 초록=끝났거나 잘된 것 · 주황=오늘만 · 빨강=주의(정체·이전 무게만) · 회색=중립 정보 */
+.ov-st,.tl-c,.ro-c{height:24px!important;padding:0 8px!important;border-radius:8px!important;font-size:12px!important;font-weight:700!important;line-height:1!important;display:inline-flex!important;align-items:center;white-space:nowrap}
+.ov-st.done,.tl-c.ok,.tl-c.up,.ov-st.up,.ro-c.ok{background:transparent!important;padding:0 2px!important}
+.tl-c.up,.ov-st.up{color:var(--accent-ink)!important}
+.ov-st:not(.next):not(.rx-nx):not(.done):not(.up){background:transparent!important;color:var(--ink-3)!important;padding:0 2px!important}
+.ro-c.ok{color:var(--green)!important}
+.ro-c.nx{background:rgba(61,124,253,.18)!important;color:var(--accent-ink)!important}
+/* 표시 칩 */
+.ed-chip,.re-chg,.co-new,.mr-tag,.rx-mine,.ab,.cel-prt,.re-exs .co-tag,.co-tag{height:20px!important;padding:0 6px!important;border-radius:6px!important;font-size:12px!important;font-weight:700!important;line-height:1!important;font-style:normal;display:inline-flex!important;align-items:center;white-space:nowrap;vertical-align:2px}
+.ed-chip,.re-chg,.re-chg.auto,.co-new,.mr-tag,.rx-ln .mr-tag,.rx-mine,.ab,.co-tag,.co-tag.t{background:var(--fill-2)!important;color:var(--ink-2)!important}
+.re-chg.auto{color:var(--ink-3)!important}
+.cel-prt{background:var(--green-soft)!important;color:var(--green)!important}
+.rx-ln .mr-tag{height:20px!important;padding:0 6px!important;border-radius:6px!important;font-size:12px!important;line-height:1!important}
+/* 선택 칩 */
+.co-chip{height:32px;padding:0 12px;border-radius:999px;font-size:13px;font-weight:600}
+/* 번호 라벨 — 운동 탭·시트 루틴 카드(홈 .tl-n과 같은 모양, 카드라 폭 56) */
+.pk-card,.pk-card.done{grid-template-columns:56px minmax(0,1fr) auto!important}
+.pk-ln{width:56px;height:28px;border-radius:8px;background:var(--fill-2);color:var(--ink-2);display:grid;place-items:center;font-size:12px;font-weight:700;line-height:1;letter-spacing:-.02em;white-space:nowrap}
+.pk-card.rec .pk-ln{background:var(--cta);color:#fff}
+.pk-card.now .pk-ln{background:rgba(255,255,255,.22);color:#fff}
+.pk-card.done .pk-ln{background:var(--fill);color:var(--ink-4);box-shadow:inset 0 0 0 1px var(--line)}
+/* 운동 기록 카드 상태 칩(.status) — 증량=다음에 할 것(파랑 옅게), 유지·첫 기록·수정 중·세트 진행=회색. 정체·이전 무게=빨강(주의, 2026-11-10 확정) */
+.status{height:24px!important;padding:0 8px!important;border-radius:8px!important;font-size:12px!important;font-weight:700!important;line-height:1!important;display:inline-flex!important;align-items:center;white-space:nowrap}
+.status.k-up{background:rgba(61,124,253,.18)!important;color:var(--accent-ink)!important}
+.status.k-hold,.status.k-first,.status.k-edit{background:var(--fill-2)!important;color:var(--ink-2)!important}
+/* v112b 전수 점검 반영 */
+/* 부위 칩 — 상태 칩 규격(24·12/700·반경 8), 색은 부위 고유 색(인라인) */
+.pp,.mr-pc,.cr-pp,#sheetT .st-pp{height:24px!important;padding:0 8px!important;border-radius:8px!important;font-size:12px!important;font-weight:700!important;line-height:1!important;display:inline-flex!important;align-items:center;white-space:nowrap;font-style:normal}
+
+.mr-pc small{font-size:12px!important}
+/* 순서 번호 — 세트 번호·종목 순서 모두 26×26 · 반경 8 · 12.5px/700 */
+.pd-n{width:26px!important;height:26px!important;border-radius:8px!important;font-size:12.5px!important}
+.set-row.pr .no{background:var(--green-soft)!important;color:var(--green)!important}
+.set-row.drop .no{background:var(--fill-2)!important;color:var(--ink-2)!important}
+/* 표시 칩으로 정리: 기법 태그·변화량·AI 리포트·코치 범례 */
+.rv-t,.rv-d,.rv-d.up,.rv-d.dn,.pill-ai,.ai-pills .pill-ai,.st,.cel-cd,.ssx-b{height:20px!important;padding:0 6px!important;border-radius:6px!important;font-size:12px!important;font-weight:700!important;line-height:1!important;display:inline-flex!important;align-items:center;white-space:nowrap;font-style:normal;vertical-align:2px}
+.rv-t,.rv-d,.rv-d.up,.rv-d.dn,.pill-ai,.st-mid,.ssx-b{background:var(--fill-2)!important;color:var(--ink-2)!important}
+.lg-k{background:var(--fill-2)!important;color:var(--ink-2)!important}
+.st-ok{background:var(--green-soft)!important;color:var(--green)!important}
+.st-bad{background:var(--red-soft)!important;color:var(--red)!important}
+/* 컨디션 — 좋음=초록 · 보통=회색 · 나쁨=빨강(주의). 달력 점(cdot)과 같은 색 */
+.cel-cd{background:var(--fill-2)!important}
+.cel-cd.c-ok,.cel-g b.c-ok,.hh-s b.c-ok{color:var(--ink-2)!important}
 </style>
 <script>
 /* v110: 우선 부위 = 주간 볼륨 비중 (2026-11-10 재홍 확정)
