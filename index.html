@@ -5,7 +5,6 @@
 <meta property="og:title" content="hardwrk">
 <meta property="og:description" content="운동 기록과 증량 관리를 한곳에서. 지난 기록을 보고 오늘 할 운동과 목표 무게를 알려줘요.">
 <!-- /HW:META --><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: phone-first single column, max 520px. 기록 = 아침 체중 → 현황 3지표 → AI 요약 → 근력/체성분/러닝 드릴다운. 식단 = 지금 먹을 것 → 하루 목표 → 흐름 → 규칙(접힘). Fixed full-width CTA above the tab bar. Light only. */
@@ -5168,6 +5167,49 @@ html,body{touch-action:manipulation}
     if(MR)MR.lastF=JSON.stringify(f);CO.fnote=null;coSave();mrRender();toast('우선 부위를 되돌렸어요');track('focus_migrate_undone',{})});
   /* 새로 루틴을 만든 사용자는 맞춤 대상 아님(처음 추천 = 지금 설정) */
   const _st=mrStart;mrStart=function(){CO.fsync=1;coSave();_st()};
+})();
+</script>
+<!-- v113 (2026-11-10): 내 루틴 루틴별/부위별 탭 -->
+<style id="hw-v113">
+.mr-vw{margin:0 20px 12px}
+.mr-vw.sw-eq{grid-template-columns:repeat(2,1fr)}
+.mrx-gp.pt>i{color:var(--ink-3);font-weight:600}
+.mr-rt .rx-r1 .pd{font-style:normal;margin-left:4px}
+</style>
+<script>
+/* v113 시안: 내 루틴 — 루틴별 / 부위별 탭. 부위별 탭은 루틴별 화면과 같은 상자·줄·팝오버를 쓰고, 왼쪽 열만 부위 → 루틴 N으로 바뀜 */
+(function(){
+  const ORIG=mrRender;
+  function partHTML(){
+    const P=mrP(),pf=CO.profile||{},fo=(Array.isArray(pf.focus)?pf.focus:[]).filter(p=>PARTS5.includes(p));
+    const M={};P.routines.forEach((r,ri)=>r.exercises.forEach(e=>{const p=vMain(coPart(e.part))||'기타';(M[p]=M[p]||[]).push({ri,r,e})}));
+    const ord=fo.concat(PARTS5.filter(p=>!fo.includes(p))).filter(p=>M[p]).concat(Object.keys(M).filter(p=>!PARTS5.includes(p)));
+    const V=mrVol();let h='';
+    ord.forEach(p=>{const L=M[p],ts=L.reduce((a,x)=>a+(+x.e.sets||0),0),fq=new Set(L.map(x=>x.ri)).size,v=V.find(x=>x.p===p);
+      const dd=v&&v.v!==v.b?'<em class="mr-d pd'+(v.v<v.b?' dn':'')+'">'+(v.v>v.b?'+':'−')+Math.abs(v.v-v.b)+'</em>':'';
+      const so=SUBS[p]||[],sm={};L.forEach(x=>{const s=vSub(x.e)||'기타';sm[s]=(sm[s]||0)+(+x.e.sets||0)});
+      const sk=so.filter(s=>sm[s]).concat(Object.keys(sm).filter(s=>!so.includes(s)));
+      const hp=!!MR.ex&&L.some(x=>x.e._id===MR.ex);
+      h+='<section class="mr-rt rx-rt'+(hp?' haspop':'')+'" data-part="'+esc(p)+'"><div class="rx-rh"><div class="rx-r1"><b>'+esc(p)+'</b><span>'+ts+'세트'+dd+' · 주 '+fq+'회</span></div><p class="rx-r2">'+sk.map(s=>esc(s)+' '+sm[s]).join('<span class="tsep">·</span>')+'</p></div>';
+      const gs=[];L.forEach(x=>{const g=gs[gs.length-1];if(g&&g.ri===x.ri)g.x.push(x);else gs.push({ri:x.ri,r:x.r,x:[x]})});
+      const gp=(g,A,c)=>'<div class="mrx-gp pt'+(c?' cont':'')+'"><i>'+(c?'':'루틴 '+(g.ri+1))+'</i><div>'+A.map(x=>mrRow(x.e,g.r)).join('')+'</div></div>';
+      gs.forEach(g=>{const ci=g.x.findIndex(x=>x.e._id===MR.ex);if(ci<0){h+=gp(g,g.x);return}h+=gp(g,g.x.slice(0,ci+1))+mrPop(g.x[ci].e,g.r);if(ci<g.x.length-1)h+=gp(g,g.x.slice(ci+1),true)});
+      h+='<button class="mr-add" type="button" data-mrpadd="'+esc(p)+'">＋ '+esc(p)+' 종목 추가</button></section>'});
+    return h}
+  window.mrRender=mrRender=function(top){ORIG(top);if(!MR||!MR.live)return;const el=$mr(),sc=el.querySelector('.mr-sc');if(!sc)return;const st=sc.scrollTop,v=MR.view||'rt';
+    const hero=sc.querySelector('.mr-hero');if(hero)hero.insertAdjacentHTML('afterend','<div class="sw-eq mr-vw" role="radiogroup" aria-label="보는 방법">'+[['rt','루틴별'],['pt','부위별']].map(([k,l])=>'<button type="button" role="radio" aria-checked="'+(v===k)+'" data-mrview="'+k+'">'+l+'</button>').join('')+'</div>');
+    if(v!=='pt')return;
+    const S=[...sc.querySelectorAll('section.mr-rt')];if(!S.length)return;S[0].insertAdjacentHTML('beforebegin',partHTML());S.forEach(x=>x.remove());
+    const ft=el.querySelector('.mr-ft');if(ft)ft.remove();sc.classList.add('pt-v');sc.scrollTop=st};
+  $mr().addEventListener('click',e=>{if(!MR)return;const b=e.target.closest('[data-mrview],[data-mrpadd]');if(!b)return;
+    if(b.dataset.mrview){if(MR.view===b.dataset.mrview)return;MR.view=b.dataset.mrview;MR.ex=null;mrRender(true);track('rv_view_changed',{view:MR.view});return}
+    if(b.dataset.mrpadd){const p=b.dataset.mrpadd,R=mrP().routines,has=R.map((r,i)=>r.exercises.some(x=>vMain(coPart(x.part))===p)?i:-1).filter(i=>i>-1);
+      mrPick('add',has.length?has[0]:0);if(!MS)return;MS.part=p;MS.byPart=true;
+      const t=document.getElementById('sheetT');if(t)t.textContent=p+' 종목 추가';mrPickRender()}});
+  const OPR=mrPickRender;
+  window.mrPickRender=mrPickRender=function(){OPR();if(!MS||!MS.byPart)return;const box=document.getElementById('mrBox');if(!box)return;const pp=box.querySelector('.mr-pp');if(!pp)return;
+    const R=mrP().routines;pp.outerHTML='<div class="re-chips mr-pp">'+R.map((r,i)=>'<button class="re-chip'+(MS.ri===i?' on':'')+'" type="button" data-mrpr="'+i+'" aria-pressed="'+(MS.ri===i)+'">루틴 '+(i+1)+'</button>').join('')+'</div>'};
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-mrpr]');if(!b||!MS)return;e.stopPropagation();MS.ri=+b.dataset.mrpr;mrPickRender()},true);
 })();
 </script>
 </body></html>
