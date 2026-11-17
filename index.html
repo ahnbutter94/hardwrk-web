@@ -1,10 +1,10 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#1B1C1E"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><!-- HW:META 운영 -->
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#1B1C1E"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><!-- HW:META 테스트용 — 운영(index.html) 배포 때 이 블록을 운영용으로 바꿔요 -->
 <meta name="apple-mobile-web-app-title" content="hardwrk">
-<meta name="description" content="hardwrk — 내 루틴과 기록으로 이어 가는 운동 기록장">
-<meta property="og:title" content="hardwrk">
-<meta property="og:description" content="내 루틴과 기록으로 이어 가는 운동 기록장">
-<!-- /HW:META --><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>hardwrk</title>
+<meta name="description" content="운동 기록과 증량 관리를 한곳에서. 지난 기록을 보고 오늘 할 운동과 목표 무게를 알려줘요.">
+<meta property="og:title" content="hardwrk">
+<meta property="og:description" content="운동 기록과 증량 관리를 한곳에서. 지난 기록을 보고 오늘 할 운동과 목표 무게를 알려줘요.">
+<!-- /HW:META --><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: phone-first single column, max 520px. 기록 = 아침 체중 → 현황 3지표 → AI 요약 → 근력/체성분/러닝 드릴다운. 식단 = 지금 먹을 것 → 하루 목표 → 흐름 → 규칙(접힘). Fixed full-width CTA above the tab bar. Light only. */
@@ -2245,6 +2245,7 @@ body.bars-off .wrap>.brand:not(.co-brand){transform:translateY(calc(-100% - env(
    테스트 중에는 liftlog.* 로컬 저장을 liftlog.test.* 로 돌리고, 기록 저장소 대신 이 브라우저 안의 임시 저장소를 써요. */
 (function(){
   var MK='liftlog.mode',P=Storage.prototype,g=P.getItem,s=P.setItem,r=P.removeItem,test=false;
+  test=true;
   window.HW_TEST=test;
   window.HW_RAW={get:function(k){try{return g.call(localStorage,k)}catch(e){return null}},set:function(k,v){try{s.call(localStorage,k,v)}catch(e){}},remove:function(k){try{r.call(localStorage,k)}catch(e){}},
     keys:function(){var out=[];try{for(var i=0;i<localStorage.length;i++)out.push(localStorage.key(i))}catch(e){}return out}};
