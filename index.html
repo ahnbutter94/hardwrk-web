@@ -6357,6 +6357,7 @@ const _pa=mvParseAny;mvParseAny=async function(t){t=String(t||'').trim();if(!t)r
   const i2=t.indexOf('HWK2:');if(i2>-1){try{let b=t.slice(i2+5).replace(/[^A-Za-z0-9+\/]/g,'');while(b.length%4)b+='=';const bin=atob(b),u=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)u[k]=bin.charCodeAt(k);const o=JSON.parse(td(hwGunzip(u)));if(o&&o.app==='hardwrk'&&o.data&&typeof o.data==='object')return{o}}catch(e){HW_KEYERR='2:'+e}}
   return _pa(t)};
 let HW_KEYERR='';
+/* v124a: 기록 키 앞머리 대소문자 무시(hwk3: → HWK3:) */{const _pk=mvParseAny;mvParseAny=function(t){return _pk(String(t||'').replace(/hwk([1-5]):/i,(m,d)=>'HWK'+d+':'))}}
 window.HWKEY={shrink,grow,toCjk,fromCjk,toB62,fromB62,inflate:hwInflateRaw,err:()=>HW_KEYERR};
 })();
 
