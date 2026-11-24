@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#1B1C1E"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><!-- HW:META 운영 -->
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#1B1C1E"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><!-- HW:META 운영용 -->
 <meta name="apple-mobile-web-app-title" content="hardwrk">
 <title>hardwrk</title>
 <meta name="description" content="운동 기록과 증량 관리를 한곳에서. 지난 기록을 보고 오늘 할 운동과 목표 무게를 알려줘요.">
@@ -3985,7 +3985,7 @@ app.addEventListener('click',async e=>{const ag=e.target.closest('[data-advgo]')
   if(b.id==='bwSave')await saveBody(b);
   if(b.id==='aiRun')await runAI()});
 /* ---------- 미입력 검증 ---------- */
-function showSheet(title,body,actions,headAct){
+function showSheet(title,body,actions,headAct){window.hwSheetClose=null;
   const el=document.getElementById('sheet');
   el.innerHTML='<div class="sheet-bg" data-sheet="close"></div><div class="sheet-box" role="alertdialog" aria-modal="true" aria-labelledby="sheetT">'+(headAct?'<div class="sheet-h"><b id="sheetT">'+title+'</b>'+headAct+'</div>':'<b id="sheetT">'+title+'</b>')+(body.startsWith('<div')?body:'<p>'+body+'</p>')+'<div class="sheet-act'+(actions.some(a=>a.grow)?' row':'')+'">'+actions.filter(a=>!a.link).map(a=>'<button class="'+(a.primary?'sp':'ss2')+'" data-sheet="'+a.id+'"'+(a.grow?' style="flex:'+a.grow+'"':'')+'>'+a.label+'</button>').join('')+'</div>'+(actions.some(a=>a.link)?'<div class="sheet-links">'+actions.filter(a=>a.link).map(a=>'<button class="textbtn" data-sheet="'+a.id+'">'+a.label+'</button>').join('')+'</div>':'')+'</div>';
   el.hidden=false;sheetHandlers=Object.fromEntries(actions.map(a=>[a.id,a.fn]));
@@ -3995,7 +3995,7 @@ function hideSheet(){const el=document.getElementById('sheet');el.hidden=true;el
 document.getElementById('sheet').addEventListener('click',e=>{const pk=e.target.closest('[data-pick]');if(pk){if(pk.getAttribute('aria-disabled')==='true')return;const g=sheetGo;sheetGo=null;hideSheet();if(g)g(pk.dataset.pick);return}
   const ad=e.target.closest('[data-add]');if(ad){hideSheet();openAddSheet(ad.dataset.add);return}
   const a=e.target.closest('[data-edit],[data-receipt]');if(a){hideSheet();if(a.dataset.receipt)openReceipt(a.dataset.receipt,a.dataset.date);else openEdit(a.dataset.edit,a.dataset.date);return}
-  const b=e.target.closest('[data-sheet]');if(!b)return;const id=b.dataset.sheet;hideSheet();if(id!=='close'&&sheetHandlers[id])sheetHandlers[id]()});
+  const b=e.target.closest('[data-sheet]');if(!b)return;const id=b.dataset.sheet;hideSheet();if(id==='close'){const f=window.hwSheetClose;window.hwSheetClose=null;if(f)f();return}if(sheetHandlers[id])sheetHandlers[id]()});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='bwKg'){e.preventDefault();document.getElementById('bwSave')?.click();return}if(e.key==='Escape'&&!document.getElementById('sheet').hidden)hideSheet()});
 function markMissing(ids){
   state.missing=new Set(ids);render();
@@ -5913,7 +5913,7 @@ body.pf-on{overflow:hidden}
 /* v114 (2026-11-16 재홍 확정 — 문서 'claude/하드웍 v114 묶음 확정')
    A 종목 건너뛰기 · B 기구별 기록(기구 칩) · C 오타 대응 · D 기구 합치기(연결 표) · E 원정 운동 · F 캘린더 일요일 시작 · G 문구·버전 */
 (function(){
-const HW_VER='v145';window.HW_VER=HW_VER;
+const HW_VER='v149';window.HW_VER=HW_VER;
 const CHEVD='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
 const CHR='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
 const PINI='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11A6.5 6.5 0 0 1 18.5 10c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg>';
@@ -5949,6 +5949,9 @@ function lastLine(r){if(!r)return'';const ss=entrySets(r.e);return short(r.s.dat
 
 /* ---------- B 기구 칩 ---------- */
 window.hwGearChip=function(k,dv){if(dv&&dv.gneed)return '';const g=dv?hwGDisp(k,dv.gear):'',lbl=hwChipLbl(k,g);
+  {const x=hwNmOf(gRes(k,dv&&dv.gear||'')),q=hwGQ(k,dv)?' gq-on':'';if(x){const bl=hwBrChip(hwBrEn(x.br)),nn=!x.nm&&hwNNget(k,x.br);
+    return '<button type="button" class="gear-chip hw-gc'+q+'" data-hw="gear" data-k="'+k+'" aria-label="'+esc(NAMES[k]||'')+' 브랜드 · '+esc(bl)+'"><span class="hw-gl">'+esc(bl)+'</span>'+CHEVD+'</button>'+
+      '<button type="button" class="gear-chip hw-gc hw-gn'+(x.nm?'':nn?' hw-nn':' em')+q+'" data-hw="'+(x.nm?'gnlist':'gname')+'" data-k="'+k+'" aria-label="'+esc(NAMES[k]||'')+' 기구 이름'+(x.nm?' · '+esc(x.nm):'')+'"><span class="hw-gl">'+esc(x.nm||'기구 이름')+'</span>'+CHEVD+'</button>'}}
   return '<button type="button" class="gear-chip hw-gc'+(lbl?'':' em')+(hwGQ(k,dv)?' gq-on':'')+'" data-hw="gear" data-k="'+k+'" aria-label="'+esc(NAMES[k]||'')+' 기구'+(lbl?' · '+esc(lbl):' 선택')+'"><span class="hw-gl">'+(lbl?esc(lbl):'기구 선택')+'</span>'+CHEVD+'</button>'};
 let GS=null;/* {k,mode:'live'|'past',id} */
 function curGear(){if(!GS)return'';if(GS.mode==='live'){const dv=curDraft(GS.k);return dv&&!dv.gneed?gRes(GS.k,dv.gear||''):''}const s=sessions.find(x=>x.date+'_'+x.day===GS.id),e=s&&s.entries&&s.entries[GS.k];return e?gRes(GS.k,e.gear||''):''}
@@ -5960,7 +5963,7 @@ function hwUsedB(k,tool){const L=[],aw={};sessions.slice().sort((a,b)=>a.date<b.
 /* 다른 종목(평소 헬스장)에서 쓴 제조사: [{b,c(종목 수)}] 많이 쓴 순 */
 function hwOtherB(k,tool){const per={};sessions.slice().sort((a,b)=>a.date<b.date?-1:1).forEach(s=>{if(s.away)return;for(const x in (s.entries||{})){if(x===k)continue;const e=s.entries[x];if(!e.gear)continue;const S=hwPartsG(gRes(x,e.gear));if(S.t!==tool||!S.b)continue;const b=hwCanonB(S.b.split(' · ')[0]);if(!b||gN(b)===gN(GUNK))continue;per[x]=b}});
   const c={};Object.values(per).forEach(b=>{c[b]=(c[b]||0)+1});return{list:Object.keys(c).map(b=>({b,c:c[b]})).sort((a,b)=>b.c-a.c),n:Object.keys(per).length}}
-function hwBRow(b,sel,sub,attr,cur){const[en,ko]=hwBrPair(b);return '<button type="button" class="sw-o hw-brow" '+attr+' aria-pressed="'+!!sel+'"><span><b>'+esc(en||b)+(cur?'<em class="hw-cur">현재</em>':'')+'</b><small>'+esc([ko,sub].filter(Boolean).join(' · '))+'</small></span><i aria-hidden="true">'+CHECK+'</i></button>'}
+function hwBRow(b,sel,sub,attr,cur){const[en,ko]=String(b).indexOf(' · ')>0?[hwBrDisp(b),'']:hwBrPair(b);return '<button type="button" class="sw-o hw-brow" '+attr+' aria-pressed="'+!!sel+'"><span><b>'+esc(en||b)+(cur?'<em class="hw-cur">현재</em>':'')+'</b><small>'+esc([ko,sub].filter(Boolean).join(' · '))+'</small></span><i aria-hidden="true">'+CHECK+'</i></button>'}
 function hwGTitle(back,q,sub){return '<span class="hw-gt">'+(back?'<button type="button" class="hw-gback" data-hw="gback">'+CHEVL+esc(back)+'</button>':'')+(sub?'<small>'+esc(sub)+'</small>':'')+'<span>'+q+'</span></span>'}
 const CHEVL='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
 function hwGearSheet(k,ctx){GS=Object.assign({k,mode:'live'},ctx||{});
@@ -5970,39 +5973,40 @@ function hwGearSheet(k,ctx){GS=Object.assign({k,mode:'live'},ctx||{});
   if(!GS.step){const t0=cs.t||hwToolOf(lastGear(k,'9999-12-31'));GS.tool=A.indexOf(t0)>=0?t0:(A.length===1?A[0]:'');GS.step=GS.tool&&subTools(GS.tool)?(GS.tool==='케이블'?'cable':GS.tool==='바벨'?'bar':(hwUsedB(k,GS.tool).length?'brand':'find')):'tool';if(GS.step==='tool'&&A.length===1){GS.tool=A[0]}}
   if(GS.cb===undefined){GS.cb=cs.t===GS.tool?cs.b:'';GS.ch=cs.t===GS.tool?cs.h:''}
   if(GS.sel===undefined)GS.sel=cs.t===GS.tool?cs.b:null;
-  const tool=GS.tool,nm=hwDN(NAMES[k]),later={id:'hwgx',label:'나중에',grow:1,fn:()=>{if(GS&&GS.after)GS.after()}},done=fn=>({id:'hwgok',label:'완료',primary:true,grow:1.6,fn});
-  const backT=tool||'';let h='',title='',acts=[later];
+  const tool=GS.tool,nm=hwDN(NAMES[k]),done=fn=>({id:'hwgok',label:'완료',primary:true,grow:1,fn});
+  const backT=GS.fb?'':(tool||'');let h='',title='',acts=[];
   if(GS.step==='tool'){const row=GS.more?A.concat(HWTOOLS.filter(t=>A.indexOf(t)<0)):A;
-    title=hwGTitle('', '어떤 도구로 해요?',nm);
-    h='<div class="hw-gs3"><div class="hw-tlist">'+row.map(t=>'<button type="button" class="hw-trow" data-hw="gtool" data-t="'+t+'" aria-current="'+(t===(cs.t||''))+'">'+hwTIco(t)+'<span><b>'+t+'</b><small>'+(t==='바벨'&&!hwBarAsk(k)?'긴 봉에 원판을 끼워 드는 기구':HWTD[t])+'</small></span>'+(subTools(t)?CHR:'')+'</button>').join('')+'</div>'+(GS.more||A.length>=HWTOOLS.length?'':'<button type="button" class="hw-tlink" data-hw="gmore">다른 도구 보기</button>')+'</div>'}
-  else if(GS.step==='brand'){const U=hwUsedB(k,tool);if(cs.t===tool&&cs.b&&!U.some(o=>gN(o.b)===gN(cs.b)))U.unshift({b:cs.b,away:false});
-    title=hwGTitle(backT,'어떤 기구예요?','');
+    title=hwGTitle('', '어떤 종류로 해요?',nm);
+    h='<div class="hw-gs3"><div class="hw-tlist">'+row.map(t=>'<button type="button" class="hw-trow" data-hw="gtool" data-t="'+t+'" aria-current="'+(t===(cs.t||''))+'">'+hwTIco(t)+'<span><b>'+t+'</b><small>'+(t==='바벨'&&!hwBarAsk(k)?'긴 봉에 원판을 끼워 드는 기구':HWTD[t])+'</small></span>'+(subTools(t)?CHR:'')+'</button>').join('')+'</div>'+(GS.more||A.length>=HWTOOLS.length?'':'<button type="button" class="hw-tlink" data-hw="gmore">다른 종류 보기</button>')+'</div>'}
+  else if(GS.step==='brand'){let U=hwUsedB(k,tool);if(cs.t===tool&&cs.b&&!U.some(o=>gN(o.b)===gN(cs.b)))U.unshift({b:cs.b,away:false});
+    if(GS.fb){const fb=gN(hwCanonB(GS.fb));U=U.filter(o=>{const x=hwNmOf(o.b);return x&&gN(hwCanonB(x.br))===fb})}
+    title=hwGTitle(backT,'어떤 기구로 기록할까요?','');
     h='<div class="hw-gs3"><div class="hw-picks hw-gl2">'+U.map(o=>hwBRow(o.b,GS.sel!==null&&gN(GS.sel)===gN(o.b),o.away?'다른 헬스장':'','data-hw="gsel" data-b="'+esc(o.b)+'"',cs.t===tool&&!!cs.b&&gN(cs.b)===gN(o.b))).join('')+
-      '<button type="button" class="hw-find hw-find2" data-hw="gfind"><span><b>다른 기구로 기록하기</b><small>지금 기록은 그대로, 새 기구는 따로 쌓여요</small></span>'+CHR+'</button>'+(away?'<button type="button" class="sw-o hw-brow" data-hw="gbr" data-b="'+GUNK+'"><span><b>잘 모르겠어요</b><small>\'모르는 기구\' 기록으로 따로 모아 둬요</small></span><i aria-hidden="true">'+CHECK+'</i></button>':'')+'</div>'+
-      (away?'':'<button type="button" class="hw-tlink'+(GS.sel===''?' on':'')+'" data-hw="gsel" data-b="">구분 안 함 · '+tool+' 기록을 하나로 봐요</button>')+'</div>';
-    acts=[later,done(()=>{const g=GS;if(!g)return;if(g.sel===null){toast('기구를 골라 주세요');hwGearSheet(g.k,g);return}hwSplitAsk(hwJoinG(tool,g.sel,''))})]}
+      (GS.fb?'<button type="button" class="hw-find hw-find2" data-hw="gnnew"><span><b>다른 '+esc(hwBrChip(hwBrEn(GS.fb)))+' 기구로 기록하기</b><small>지금 기록은 그대로, 새 기구는 따로 쌓여요</small></span>'+CHR+'</button>':'<button type="button" class="hw-find hw-find2" data-hw="gfind"><span><b>다른 기구로 기록하기</b><small>지금 기록은 그대로, 새 기구는 따로 쌓여요</small></span>'+CHR+'</button>')+(away?'<button type="button" class="sw-o hw-brow" data-hw="gbr" data-b="'+GUNK+'"><span><b>잘 모르겠어요</b><small>\'모르는 기구\' 기록으로 따로 모아 둬요</small></span><i aria-hidden="true">'+CHECK+'</i></button>':'')+'</div>'+
+      (away||GS.fb?'':'<button type="button" class="hw-tlink'+(GS.sel===''?' on':'')+'" data-hw="gsel" data-b="">구분 안 함 · '+tool+' 기록을 하나로 봐요</button>')+'</div>';
+    acts=[]}
   else if(GS.step==='find'){const O=hwOtherB(k,tool).list.slice(0,3),usedHere=hwUsedB(k,tool).map(o=>gN(hwCanonB(o.b.split(' · ')[0])));
     const top=O.filter(o=>usedHere.indexOf(gN(o.b))<0),topN=top.map(o=>gN(o.b));
     const all=HWBR.map(hwBrSt).filter(b=>topN.indexOf(gN(b))<0);
     const backF=GS.fromStep==='cable'?'케이블':GS.fromStep==='brand'||backT?tool:'';
-    title=hwGTitle(backF,'어느 회사 기구예요?','');
+    title=hwGTitle(backF,'어느 브랜드 기구예요?','');
     const row=(b,sub)=>hwBRow(b,false,sub,'data-hw="gbr" data-b="'+esc(b)+'" data-q="'+esc((hwBrPair(b).join(' ')+' '+b).toLowerCase())+'"');
-    h='<div class="hw-gs3 hw-find3"><p class="sw-c hw-bcap">옆면 또는 등받이 쪽에 로고를 찾아보세요.</p><input id="hwBrQ" class="hw-fld hw-gq" type="search" autocomplete="off" enterkeyhint="search" placeholder="영문·한글 모두 검색돼요" aria-label="제조사 검색"><div class="hw-brl" id="hwBrL">'+
-      (top.length?'<p class="hw-blh">여기서 쓴 제조사</p>'+top.map(o=>row(o.b,o.c+'종목')).join(''):'')+'<p class="hw-blh">전체 · A–Z</p>'+all.map(b=>row(b,'')).join('')+
+    h='<div class="hw-gs3 hw-find3"><p class="sw-c hw-bcap">옆면·등받이 로고를 찾아보세요</p><input id="hwBrQ" class="hw-fld hw-gq" type="search" autocomplete="off" enterkeyhint="search" placeholder="영문·한글 모두 검색돼요" aria-label="브랜드 검색"><div class="hw-brl" id="hwBrL">'+
+      (top.length?'<p class="hw-blh">여기서 쓴 브랜드</p>'+top.map(o=>row(o.b,o.c+'종목')).join(''):'')+'<p class="hw-blh">전체 · A–Z</p>'+all.map(b=>row(b,'')).join('')+
       (away&&tool!=='케이블'?'<button type="button" class="sw-o hw-brow" data-hw="gbr" data-b="'+GUNK+'" data-q="잘 모르겠어요 모름"><span><b>잘 모르겠어요</b><small>\'모르는 기구\' 기록으로 따로 모아 둬요</small></span><i aria-hidden="true">'+CHECK+'</i></button>':'')+
-      '<p class="hw-gq0" id="hwBrQ0" hidden>맞는 제조사가 없어요. 아래 \'목록에 없어요\'로 직접 넣어 주세요</p></div><button type="button" class="hw-tlink hw-ctr" data-hw="gtype">목록에 없어요 · 직접 입력</button></div>'}
+      '<p class="hw-gq0" id="hwBrQ0" hidden>맞는 브랜드가 없어요. 아래 \'목록에 없어요\'로 직접 넣어 주세요</p></div><button type="button" class="hw-tlink hw-ctr" data-hw="gtype">목록에 없어요 · 직접 입력</button></div>'}
   else if(GS.step==='cable'){const U=hwUsedB(k,'케이블');if(GS.cb&&!U.some(o=>gN(o.b)===gN(GS.cb)))U.unshift({b:GS.cb,away:false});
-    title=hwGTitle(backT,'어떤 기구예요?','');
+    title=hwGTitle(backT,'어떤 기구로 기록할까요?','');
     h='<div class="hw-gs3">'+(U.length?'<p class="hw-blh">쓴 기구</p>':'')+'<div class="hw-picks hw-gl2">'+U.map(o=>hwBRow(o.b,gN(GS.cb||'')===gN(o.b),o.away?'다른 헬스장':'','data-hw="gcb" data-b="'+esc(o.b)+'"',cs.t==='케이블'&&!!cs.b&&gN(cs.b)===gN(o.b))).join('')+
-      (U.length?'<button type="button" class="hw-find hw-find2" data-hw="gfind"><span><b>다른 기구로 기록하기</b><small>지금 기록은 그대로, 새 기구는 따로 쌓여요</small></span>'+CHR+'</button>':'<button type="button" class="hw-find" data-hw="gfind">제조사 찾기'+CHR+'</button>')+'</div><div class="hw-div"></div>'+
+      (U.length?'<button type="button" class="hw-find hw-find2" data-hw="gfind"><span><b>다른 기구로 기록하기</b><small>지금 기록은 그대로, 새 기구는 따로 쌓여요</small></span>'+CHR+'</button>':'<button type="button" class="hw-find" data-hw="gfind">브랜드 찾기'+CHR+'</button>')+'</div><div class="hw-div"></div>'+
       '<p class="hw-blh">손잡이</p><p class="sw-c hw-bcap">손잡이마다 기록을 따로 이어가요.</p><div class="gear-sug hw-bl">'+HWHANDLES.concat(['']).map(x=>'<button type="button" class="gear-chip hw-bc" data-hw="gch" data-v="'+x+'" aria-pressed="'+((GS.ch||'')===x)+'">'+(x||'나누지 않기')+'</button>').join('')+'</div></div>';
-    acts=[later,done(()=>{const g=GS;if(!g)return;hwSplitAsk(hwJoinG('케이블',g.cb||'',g.ch||''))})]}
+    acts=[done(()=>{const g=GS;if(!g)return;hwSplitAsk(hwJoinG('케이블',g.cb||'',g.ch||''))})]}
   else if(GS.step==='bar'){const sel=GS.bsel!==undefined?GS.bsel:(cs.t==='바벨'?cs.h:null);
     title=hwGTitle(backT,'어떤 바예요?','');
     h='<div class="hw-gs3"><div class="hw-picks hw-gl2">'+[['스트레이트 바','곧은 바'],['EZ바','구부러진 바 · 컬·익스텐션에 많이 써요']].map(([b,d])=>'<button type="button" class="sw-o" data-hw="gbar" data-v="'+b+'" aria-pressed="'+(sel===b)+'"><span><b>'+b+(cs.t==='바벨'&&cs.h===b?'<em class="hw-cur">현재</em>':'')+'</b>'+(d?'<small>'+d+'</small>':'')+'</span><i aria-hidden="true">'+CHECK+'</i></button>').join('')+'</div>'+
       '<button type="button" class="hw-tlink'+(sel===''?' on':'')+'" data-hw="gbar" data-v="">구분 안 함 · 바벨 기록을 하나로 봐요</button></div>';
-    acts=[later,done(()=>{const g=GS;if(!g)return;const v=g.bsel!==undefined?g.bsel:sel;if(v===null){toast('바를 골라 주세요');hwGearSheet(g.k,g);return}hwSplitAsk(hwJoinG('바벨','',v||''))})]}
-  showSheet(title,h,acts);
+    acts=[done(()=>{const g=GS;if(!g)return;const v=g.bsel!==undefined?g.bsel:sel;if(v===null){toast('바를 골라 주세요');hwGearSheet(g.k,g);return}hwSplitAsk(hwJoinG('바벨','',v||''))})]}
+  showSheet(title,h,acts);window.hwSheetClose=GS.after||null;
   const bx=document.querySelector('#sheet .sheet-box');if(bx)bx.classList.toggle('hw-tall',GS.step==='find');
   const q=document.getElementById('hwBrQ');if(q)q.addEventListener('input',()=>{const v=q.value.trim().toLowerCase(),p=hwPK(v);let n=0;document.querySelectorAll('#hwBrL [data-hw="gbr"]').forEach(b=>{const t=b.dataset.q||'',ok=!v||t.indexOf(v)>=0||t.replace(/\s/g,'').indexOf(v.replace(/\s/g,''))>=0||(p&&hwPK(t).indexOf(p)>=0);b.hidden=!ok;if(ok)n++});document.querySelectorAll('#hwBrL .hw-blh').forEach(x=>x.hidden=!!v);const z=document.getElementById('hwBrQ0');if(z)z.hidden=n>0});
   track('gear_sheet',{step:GS.step})}
@@ -6017,20 +6021,102 @@ function hwGQ(k,dv){if(!dv||!hwMach(k)||dv.gneed||state.logDate!==TODAY)return '
   const bub=(msg,sub,btns)=>'<div class="gq-bub" role="status"><div class="gq-shine"><div class="gq-m"><i aria-hidden="true">✦</i><span><b>'+msg+'</b>'+(sub?'<small>'+sub+'</small>':'')+'</span></div><div class="gq-a">'+btns+'</div></div></div>';
   if(dv.gdevQ&&!dv.gdevOff)return bub(esc(dv.gdevQ),'','<button type="button" class="gq-p" data-hw="gqchg" data-k="'+k+'">기구 바꾸기</button><button type="button" class="gq-l" data-hw="gqdevno" data-k="'+k+'">아니요</button>');
   const unc=!!dv.gear&&!dv.gearSet&&gN(dv.gear)===gN(hwDefG(k))&&!sessions.some(s=>s.entries&&s.entries[k]&&s.entries[k].gear);
+  if(dv.gear&&!unc&&!dv.gqOff&&hwNeedName(k,dv)){const o=hwGQS();if((o.s||0)<2&&(o.m[k]||0)<2)return hwQ7(k,dv,bub);return ''}
   if((dv.gear&&!unc)||dv.gqOff)return '';const o=hwGQS();if((o.s||0)>=2||(o.m[k]||0)>=2)return '';
   const r=hwRecB(k),A=hwAllowU(k);
   if(unc&&hwStd(NAMES[k]).b){const g=dv.gear;return bub('잠깐, 지금 운동 기구 '+esc(hwBrPair(hwStd(NAMES[k]).b)[0])+'인가요?','한 번만 확인하면 기억해 둘게요. 이 기구에 맞춰 무게 추천과 기록 분석이 더 정확해져요.','<button type="button" class="gq-p" data-hw="gqyes" data-k="'+k+'" data-v="'+esc(g)+'">네, 맞아요</button><button type="button" class="gq-s" data-hw="gqother" data-k="'+k+'">다른 기구</button><button type="button" class="gq-l" data-hw="gqlater" data-k="'+k+'">다음에</button>')}
   if((!r||unc)&&A.length>=2){const t=hwToolDef(k);return bub('잠깐, 지금 '+t+josaRo(t)+' 하고 있나요?','한 번만 기록하면 기억해 둘게요. 도구에 맞춰 무게 추천과 기록 분석이 더 정확해져요.','<button type="button" class="gq-p" data-hw="gqtool" data-k="'+k+'" data-t="'+t+'">네, 맞아요</button><button type="button" class="gq-s" data-hw="gqtools" data-k="'+k+'">다른 도구</button><button type="button" class="gq-l" data-hw="gqlater" data-k="'+k+'">다음에</button>')}
   if(r)return bub('잠깐, 지금 운동 기구 '+esc(hwBrPair(r.b)[0])+'인가요?','한 번만 기록하면 기억해 둘게요. 이 기구에 맞춰 무게 추천과 기록 분석이 더 정확해져요.','<button type="button" class="gq-p" data-hw="gqyes" data-k="'+k+'" data-v="'+esc(hwJoinG(r.T,r.b,''))+'">네, 맞아요</button><button type="button" class="gq-s" data-hw="gqother" data-k="'+k+'">다른 기구</button><button type="button" class="gq-l" data-hw="gqlater" data-k="'+k+'">다음에</button>');
   if(A.length===1&&A[0]==='바벨')return bub('쉬는 동안 어떤 바인지 남겨 둘까요?','일자바와 EZ바는 같은 무게도 느낌이 달라요. 한 번만 고르면 기억해 둘게요.','<button type="button" class="gq-p" data-hw="gqtool" data-k="'+k+'" data-t="바벨">바 고르기</button><button type="button" class="gq-l" data-hw="gqlater" data-k="'+k+'">다음에</button>');
-  return bub('쉬는 동안 기구 이름 남겨 둘까요?','한 번만 기록하면 기억해 둘게요. 이 기구에 맞춰 무게 추천과 기록 분석이 더 정확해져요.','<button type="button" class="gq-p" data-hw="gqother" data-k="'+k+'">기구 정하기</button><button type="button" class="gq-l" data-hw="gqlater" data-k="'+k+'">다음에</button>')}
+  return bub('쉬는 동안 어떤 기구인지 남겨 둘까요?','기구를 기억해서 기록을 이어갈게요','<button type="button" class="gq-p" data-hw="gqother" data-k="'+k+'">고르기</button><button type="button" class="gq-l" data-hw="gqlater" data-k="'+k+'">다음에</button>')}
 /* ---- v122 강제 UI(시안 K4 기구 2개 이상 · K5 원정) ---- */
 function hwForceUI(k,dv,date){if(!dv||!dv.gneed||!hwMach(k))return '';/* v128: 코치 말풍선으로 통일 */
   const bub=(msg,sub,btns)=>'<div class="gq-bub hw-fq" role="status"><div class="gq-shine"><div class="gq-m"><i aria-hidden="true">✦</i><span><b>'+msg+'</b><small>'+sub+'</small></span></div><div class="gq-a">'+btns+'</div></div></div>';
-  if(dv.gmulti){const L=hwMultiG(k,date||state.logDate);return bub('오늘은 어느 기구로 해요?','기구마다 무게 기록을 따로 이어가요',L.map(g=>'<button type="button" class="gq-s" data-hw="gfpick" data-k="'+k+'" data-g="'+esc(g)+'">'+esc(hwChipLbl(k,g))+'</button>').join('')+'<button type="button" class="gq-l" data-hw="gear" data-k="'+k+'">다른 기구</button>')}
-  return bub('어떤 기구로 해요?','헬스장마다 무게가 달라서 골라야 세트를 체크할 수 있어요','<button type="button" class="gq-p" data-hw="gear" data-k="'+k+'">기구 고르기</button>')}
-function hwMultiG(k,date){const m=new Map();sessions.forEach(s=>{if(s.away||(date&&s.date>=date))return;const e=s.entries&&s.entries[k];if(!e||!e.gear||!entrySets(e).length)return;const r=gRes(k,e.gear);if(!r||gN(r)===gN(GUNK))return;const S=hwPartsG(r),cb=S.b?hwCanonB(S.b.split(' · ')[0]):'',key=gN(hwJoinG(S.t,cb,S.h));if(!m.has(key))m.set(key,canonGear(r))});return[...m.values()]}
+  if(dv.gmulti){const d0=date||state.logDate,L=hwMultiG(k,d0),lg=gN(lastGear(k,d0)||'');L.sort((a,b)=>(gN(b)===lg)-(gN(a)===lg));
+    const lb=g=>{const x=hwNmOf(g);return x?(x.nm||hwBrChip(hwBrEn(x.br))):hwChipLbl(k,g)};
+    return bub('어떤 기구로 기록할까요?','기구마다 기록을 따로 이어가요','<div class="hw-qr">'+L.map(g=>'<button type="button" class="gq-s hw-qa" data-hw="gfpick" data-k="'+k+'" data-g="'+esc(g)+'">'+esc(lb(g))+(gN(g)===lg?'<em class="hw-lt">지난번</em>':'')+'</button>').join('')+'</div><button type="button" class="gq-s hw-qa hw-qo" data-hw="gear" data-k="'+k+'">그 외 ›</button>')}
+  return bub('어떤 기구로 기록할까요?','헬스장마다 무게가 달라서 골라야 해요','<button type="button" class="gq-p" data-hw="gear" data-k="'+k+'">고르기</button>')}
+function hwMultiG(k,date){const m=new Map();sessions.forEach(s=>{if(s.away||(date&&s.date>=date))return;const e=s.entries&&s.entries[k];if(!e||!e.gear||!entrySets(e).length)return;const r=gRes(k,e.gear);if(!r||gN(r)===gN(GUNK))return;const S=hwPartsG(r),bp=S.b?S.b.split(' · '):[],cb=bp.length?[hwCanonB(bp[0])].concat(bp.slice(1)).join(' · '):'',key=gN(hwJoinG(S.t,cb,S.h));if(!m.has(key))m.set(key,canonGear(r))});
+  const named=new Set();m.forEach(g=>{const x=hwNmOf(g);if(x&&x.nm)named.add(gN(hwCanonB(x.br)))});
+  return[...m.values()].filter(g=>{const x=hwNmOf(g);return!(x&&!x.nm&&named.has(gN(hwCanonB(x.br))))})}
 window.hwForceUI=hwForceUI;window.hwGQ=hwGQ;window.hwMultiG=hwMultiG;
+
+/* ---------- v146 기구 이름(기구 고르기 통합 시안 2026-11-24 · HW-12 §3·§5·§10, HW-20 §4 Q7) ---------- */
+/* 기본 목록 1차 — 브랜드별 대표 라인(말풍선 넓은 답). 1 = 같은 종목에 여러 대인 라인(누르면 이름 칸으로 이어 적기) */
+const HWLN={'hammer strength':[['Iso-Lateral',1],['MTS',0],['Select',0]],'life fitness':[['Insignia',0],['Axiom',0],['Circuit',0]],'cybex':[['Eagle NX',0],['Prestige',0],['VR3',0]],
+  'nautilus':[['Inspiration',0],['Impact',0],['Instinct',0]],'star trac':[['Inspiration',0],['Impact',0],['Instinct',0]],'technogym':[['Selection',0],['Pure Strength',0],['Biostrength',0]],
+  'matrix':[['Ultra',0],['Versa',0],['Aura',0]],'panatta':[['Monolith',0],['Fit Evo',0]],'arsenal strength':[['Reloaded',0],['M1',0]],'atlantis':[['Precision',0],['Power',0],['Natural Motion',0]],
+  'gym80':[['Sygnum',0],['Pure Kraft',0]],'hoist':[['ROC-IT',0],['HD Dual',0]],'precor':[['Resolute',0],['Vitality',0],['Discovery',0]],'prime':[['Evolution',0],['Hybrid',0],['Legacy',0]],
+  'freemotion':[['EPIC',0]],'impulse':[['IT',0],['SL',0]],'body-solid':[['Pro ClubLine',0]],'watson':[['Animal',0],['Original',0]],'keiser':[['A300',0],['A400',0]],'drax':[['Pure Plate',0],['Welliv Pro',0]]};
+const HWWD='일월화수목금토';
+const hwWd=d=>HWWD[new Date(d+'T00:00:00').getDay()];const hwMd=d=>(+d.slice(5,7))+'/'+(+d.slice(8,10));
+const hwBrEn=b=>{try{return hwBrPair(b)[0]||b}catch(e){return b}};
+/* 머신 기구 문자열 → {br, nm} (브랜드·기구 이름). 머신이 아니거나 브랜드가 없으면 null */
+function hwNmOf(g){g=String(g||'').trim();if(!g)return null;const S=hwPartsG(g);if(S.t!=='머신'||!S.b)return null;const p=S.b.split(' · ').map(x=>x.trim()).filter(Boolean);if(!p.length||gN(p[0])===gN(GUNK))return null;return{br:p[0],nm:p.slice(1).join(' · ')}}
+/* [몰라요] 표시: 종목 + 브랜드 단위(그 기구는 더 묻지 않음, 칩은 회색) */
+const NNKEY='hw.nn';function hwNN(){try{return JSON.parse(localStorage.getItem(NNKEY)||'{}')||{}}catch(e){return{}}}
+function hwNNget(k,br){return!!hwNN()[k+'|'+gN(hwCanonB(br))]}
+function hwNNset(k,br){const o=hwNN();o[k+'|'+gN(hwCanonB(br))]=Date.now();try{localStorage.setItem(NNKEY,JSON.stringify(o))}catch(e){}}
+function hwNeedName(k,dv){if(!dv||!dv.gear||dv.gneed)return false;const x=hwNmOf(gRes(k,dv.gear));return!!(x&&!x.nm&&!hwNNget(k,x.br))}
+/* 이름 후보: ① 이 종목에서 이 브랜드로 쓴 이름(지난번) ② 같은 부위 다른 종목 ③ 기본 목록 라인 */
+function hwNameCands(k,br){const out=[],seen=new Set(),add=(n,o)=>{const key=gN(n);if(!n||seen.has(key))return;seen.add(key);out.push(Object.assign({n},o))};
+  const cb=gN(hwCanonB(br)),P=(typeof gearPart==='function')?gearPart(k):'';
+  const S=sessions.slice().sort((a,b)=>a.date<b.date?1:-1);
+  S.forEach(s=>{const e=s.entries&&s.entries[k];if(!e||!e.gear)return;const x=hwNmOf(gRes(k,e.gear));if(x&&x.nm&&gN(hwCanonB(x.br))===cb)add(x.nm,{last:true})});
+  S.forEach(s=>{for(const k2 in (s.entries||{})){if(k2===k)continue;if(P&&gearPart(k2)!==P)continue;const e=s.entries[k2];if(!e||!e.gear)continue;const x=hwNmOf(gRes(k2,e.gear));if(x&&x.nm&&gN(hwCanonB(x.br))===cb)add(x.nm,{part:NAMES[k2]||''})}});
+  (HWLN[hwBrEn(br).toLowerCase()]||[]).forEach(([n,m])=>add(n,{line:true,multi:!!m}));
+  return out}
+/* 이름 칸에 브랜드명까지 적었으면 앞의 브랜드명을 떼요(HW-12 §5) */
+function hwStripBr(v,br){v=String(v||'').trim();if(!v)return'';const en=hwBrEn(br),ko=(hwBrPair(br)[1]||''),A=[en,ko,hwBrChip(en),br].filter(Boolean);
+  for(const a in BRAL)if(gN(BRAL[a])===gN(hwCanonB(br)))A.push(a);
+  const flat=x=>x.toLowerCase().replace(/[\s\-_.]/g,'');A.sort((a,b)=>b.length-a.length);
+  for(let pass=0;pass<2;pass++){const lv=flat(v);for(const a of A){const fa=flat(a);if(!fa||lv.indexOf(fa)!==0)continue;let i=0,c=0;while(i<v.length&&c<fa.length){if(!/[\s\-_.]/.test(v[i]))c++;i++}v=v.slice(i).replace(/^[\s\-_.·:]+/,'').trim();break}}
+  return v}
+/* 브랜드만 적힌 예전 기록(이 종목·평소 헬스장) */
+function hwBrOnlyRecs(k,br,before){const cb=gN(hwCanonB(br));return sessions.filter(s=>{if(s.away||(before&&s.date>=before))return false;const e=s.entries&&s.entries[k];if(!e||!e.gear||!entrySets(e).length)return false;const x=hwNmOf(gRes(k,e.gear));return!!(x&&!x.nm&&gN(hwCanonB(x.br))===cb)}).sort((a,b)=>a.date<b.date?1:-1)}
+function hwSetSum(sets){const L=[];sets.forEach(s=>{const t=fmt(s.w)+'×'+s.r,p=L[L.length-1];if(p&&p.t===t)p.n++;else L.push({t,n:1})});return L.map(x=>x.t+(x.n>1?' ×'+x.n:'')).join(' · ')}
+/* Q7 말풍선 — 기구 이름이 뭐예요? */
+function hwQ7(k,dv,bub){const x=hwNmOf(gRes(k,dv.gear)),C=hwNameCands(k,x.br).slice(0,2);
+  const btn=c=>'<button type="button" class="gq-s hw-qa" data-hw="gqname" data-k="'+k+'" data-v="'+esc(c.n)+'"'+(c.multi?' data-m="1"':'')+'>'+esc(c.n)+(c.multi?' ›':'')+(c.last?'<em class="hw-lt">지난번</em>':'')+'</button>';
+  return bub('기구 이름이 뭐예요?','이름을 기억해서 기록을 이어갈게요','<div class="hw-qr">'+C.map(btn).join('')+'</div><button type="button" class="gq-l" data-hw="gqlater" data-k="'+k+'">다음에</button><button type="button" class="gq-s hw-qa hw-qo" data-hw="gqnms" data-k="'+k+'">그 외 ›</button>')}
+/* 이름 칸 */
+function hwNameSheet(k,ctx){GS=Object.assign(GS&&GS.k===k?GS:{k,mode:'live'},ctx||{});GS.step='name';const g=GS,br=g.br;
+  const before=g.mode==='live'?state.logDate:null,recs=g.mode==='live'?hwBrOnlyRecs(k,br,before):[],next=recs.length>0;
+  const C=hwNameCands(k,br),en=hwBrChip(hwBrEn(br));
+  const row=c=>'<button type="button" class="hw-nmo" data-hw="gnmfill" data-v="'+esc(c.n)+'"><b>'+esc(c.n)+'</b><small>'+(c.last?'이 종목 · 지난번':c.part?esc(c.part):'기본 목록')+'</small></button>';
+  const body='<div class="hw-gs3 hw-nmw"><p class="sw-c hw-bcap">옆면·등받이 이름표에 적힌 이름이에요</p><label class="hw-nmf"><span class="hw-nmp">'+esc(en)+'</span><input id="hwNmIn" type="text" autocomplete="off" autocapitalize="words" enterkeyhint="done" placeholder="예: '+esc((C[0]&&C[0].n)||'Iso-Lateral')+'" aria-label="기구 이름" value="'+esc(g.nmv||'')+'"></label><p class="hw-nmh" id="hwNmH" hidden></p><div class="hw-nml" id="hwNmL">'+C.slice(0,3).map(row).join('')+'</div></div>';
+  const save=()=>{const i=document.getElementById('hwNmIn');const raw=i?i.value:(g.nmv||'');g.nmv=raw;const v=hwStripBr(raw,br);if(!v){toast('이름을 적어 주세요');hwNameSheet(k,g);return}
+    const full=hwJoinG('머신',hwCanonB(br)+' · '+v,'');g.nmFull=full;track('gear_name',{from:g.nmFrom||'sheet',strip:v!==raw.trim()?1:0});
+    if(next){hwConfSheet(k,g);return}GS=g;hwSplitAsk(full)};
+  const unk=()=>{hwNNset(k,br);track('gear_name_unknown',{});if(g.mode==='live'){const dv=curDraft(k);if(dv){dv.gearSet=true;schedPersist()}hwGQAns(k)}render();toast('이름 없이 기록할게요')};
+  showSheet(hwGTitle(g.nmBack?g.nmBackL||'':'','기구 이름이 뭐예요?',''),body,[{id:'hwnmx',label:'몰라요',grow:1,fn:unk},{id:'hwnmok',label:next?'다음':'완료',primary:true,grow:1.6,fn:save}]);
+  window.hwSheetClose=null;
+  const i=document.getElementById('hwNmIn'),L=document.getElementById('hwNmL'),H=document.getElementById('hwNmH');
+  const upd=()=>{const raw=i.value,v=hwStripBr(raw,br),q=gN(raw);g.nmv=raw;
+    if(H){const show=!!raw.trim()&&v&&v!==raw.trim();H.hidden=!show;if(show)H.textContent='저장하면 '+v+'만 남아요'}
+    if(L){const F=q?C.filter(c=>gN(c.n).indexOf(gN(v||raw))>=0&&gN(c.n)!==gN(v)):C;L.innerHTML=F.slice(0,3).map(row).join('')}};
+  if(i){i.addEventListener('input',upd);i.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();hideSheet();save()}});upd();setTimeout(()=>{try{i.focus();const n=i.value.length;i.setSelectionRange(n,n)}catch(e){}},60)}
+  track('gear_sheet',{step:'name'})}
+/* 예전 기록 확인 — 예전 기록도 이 기구 기록인가요? */
+function hwConfSheet(k,g){GS=g;g.step='conf';const br=g.br,recs=hwBrOnlyRecs(k,br,state.logDate);
+  if(!g.cf){g.cf=new Set(recs.map(s=>s.date+'_'+s.day))}
+  const show=g.cfAll?recs:recs.slice(0,3),dv=curDraft(k),cs=dv?(dv.sets||[]).filter(isChk):[],cs0=cs[0];
+  const row=s=>{const id=s.date+'_'+s.day,on=g.cf.has(id);return'<button type="button" class="hw-cfr'+(on?'':' off')+'" data-hw="gcft" data-id="'+id+'" aria-pressed="'+on+'"><i class="hw-cb" aria-hidden="true"></i><span>'+hwMd(s.date)+' '+hwWd(s.date)+'</span><b>'+esc(hwSetSum(entrySets(s.entries[k])))+'</b></button>'};
+  const body='<div class="hw-gs3"><p class="sw-c hw-bcap">아닌 날은 제외해 주세요</p><div class="hw-cfl">'+(cs0?'<div class="hw-cfr hw-cft"><span>오늘</span><b>'+esc(fmt(+cs0.w)+'×'+cs0.r)+'</b></div>':'')+show.map(row).join('')+(!g.cfAll&&recs.length>3?'<button type="button" class="hw-cfm" data-hw="gcfmore">외 '+(recs.length-3)+'개 ›</button>':'')+'</div><p class="sw-c hw-bcap">제외한 날은 기구 이름 없이 그대로 남아요</p></div>';
+  const no=()=>{GS=g;track('gear_name_link',{n:0,of:recs.length});hwSetGear(g.nmFull)};
+  const yes=()=>{const ids=recs.map(s=>s.date+'_'+s.day).filter(id=>g.cf.has(id));if(!ids.length){toast('맞는 날을 골라 주세요');hwConfSheet(k,g);return}
+    if(!db||readOnly){toast('지금은 저장할 수 없어요');return}
+    try{window.HW_SAFE&&HW_SAFE.snap(true)}catch(e){}const prev=[];
+    ids.forEach(id=>{const s=sessions.find(x=>x.date+'_'+x.day===id);if(!s||!s.entries||!s.entries[k])return;prev.push([s,s.entries]);const E=JSON.parse(JSON.stringify(s.entries));if(!Object.prototype.hasOwnProperty.call(E[k],'g0'))E[k].g0=E[k].gear||'';E[k].gear=g.nmFull;s.entries=E;db.collection('sessions').doc(id).update({entries:E}).catch(()=>{})});
+    track('gear_name_link',{n:ids.length,of:recs.length});GS=g;hwSetGear(g.nmFull);
+    setTimeout(()=>toast('예전 기록 '+ids.length+'개를 이어서 봐요',{label:'되돌리기',fn:()=>{prev.forEach(([s,E])=>{s.entries=E;db.collection('sessions').doc(s.date+'_'+s.day).update({entries:E}).catch(()=>{})});render()}}),60)};
+  showSheet(hwGTitle('기구 이름','예전 기록도 이 기구 기록인가요?',''),body,[{id:'hwcfn',label:'아니요',grow:1,fn:no},{id:'hwcfy',label:'맞아요',primary:true,grow:1.6,fn:yes}]);
+  const y=document.querySelector('#sheet [data-sheet="hwcfy"]');if(y)y.classList.toggle('hw-dis',!g.cf.size||!recs.some(s=>g.cf.has(s.date+'_'+s.day)));
+  window.hwSheetClose=null;track('gear_sheet',{step:'conf'})}
+/* 같은 브랜드 기구 목록(이름 칩) */
+function hwNameList(k,br){hwGearSheet(k,{mode:'live',tool:'머신',step:'brand',fb:br})}
+Object.assign(window,{hwNameSheet,hwConfSheet,hwNmOf,hwNeedName,hwStripBr,hwNameCands,hwNNget});
+
 /* 비교 단위별 직전 기록 한 줄 */
 function hwBLine(k,b){const hh=history(k,undefined,b),x=hh[hh.length-1];return x?short(x.date)+' · '+setSummary(x.sets):'첫 기록'}
 /* v119: 세분을 처음 나눌 때 한 번 확인 — 기존 다른 기록이 있고 이 단위 기록이 0일 때만(재홍 확정 얼럿) */
@@ -6048,7 +6134,7 @@ function hwAssignSheet(){if(!GS)return;const k=GS.k,A=hwAllow(k).filter(t=>t!=='
   const when=L.length<=3?L.map(x=>short(x.date)).join(' · '):'지난 기록 '+L.length+'개';
   let h='<div class="hw-gs2"><p class="sw-c">'+when+' '+esc(NAMES[k]||'')+''+(L.length<=3?' 기록은':'는')+' 무엇으로 했나요? 고른 도구의 기록으로 이어져요. 무게·횟수는 바뀌지 않아요.</p><div class="hw-picks hw-gl2">';
   A.forEach(t=>{h+='<button type="button" class="sw-o" data-hw="gasn" data-t="'+t+'" aria-pressed="'+(sel===t)+'"><span><b>'+t+'</b><small>'+L.length+'개 모두 '+t+josaRo(t)+' 묶어요</small></span><i aria-hidden="true">'+CHECK+'</i></button>'});
-  h+='</div><p class="sw-c hw-gtip2">머신에서 했다면 정하지 않아도 돼요. 기구(제조사)를 고르면 자동으로 이어져요.</p></div>';
+  h+='</div><p class="sw-c hw-gtip2">머신에서 했다면 정하지 않아도 돼요. 기구(브랜드)를 고르면 자동으로 이어져요.</p></div>';
   const gs=GS;
   showSheet('지난 기록 도구 정하기',h,[{id:'gax',label:'취소',grow:1,fn:()=>{GS=gs;GS.asn=null;if(gs.fromMgr){hwLooseSheet();return}hwGearSheet(gs.k,gs)}},{id:'gao',label:'정하기',primary:true,grow:1.6,fn:()=>hwAssignGo()}]);
   requestAnimationFrame(()=>{const ok=document.querySelector('[data-sheet=gao]');if(ok)ok.disabled=!GS.asn})}
@@ -6096,15 +6182,15 @@ function hwGName(o){return o.b+(o.m?' · '+o.m:'')}
 function hwGearType(){if(!GS)return;const k=GS.k;if(!GS.nb)GS.nb={b:'',own:false,m:'',open:false};const N=GS.nb,bl=hwBrandsFor(k);
   const nm=N.b?(N.b+(N.m.trim()?' · '+N.m.trim():'')):'';
   let h='<div class="hw-gs hw-nb"><p class="hw-cap">'+esc(NAMES[k]||'')+' · 처음 쓰는 기구예요</p>'+
-    '<h4>제조사</h4><div class="gear-sug hw-bl">'+bl.map(b=>'<button type="button" class="gear-chip hw-bc" data-hw="nbb" data-g="'+esc(b)+'" aria-pressed="'+(!N.own&&N.b===b)+'">'+esc(b)+'</button>').join('')+'<button type="button" class="gear-chip hw-bc" data-hw="nbown" aria-pressed="'+N.own+'">직접 입력</button></div>'+
-    (N.own?'<input id="hwBIn" class="gear-in hw-in" maxlength="20" autocomplete="off" enterkeyhint="next" placeholder="제조사 이름" value="'+esc(N.b)+'">':'')+
-    '<h4>기구명 <small>선택</small></h4>'+(N.open||N.m?'<input id="hwMIn" class="gear-in hw-in" maxlength="20" autocomplete="off" enterkeyhint="done" placeholder="예: 아이소 로우, 시티드 로우" value="'+esc(N.m)+'">':'<button type="button" class="cx-s hw-mo" data-hw="nbm">+ 기구명 적기</button><p class="hw-cap">같은 제조사 안에서 기구가 여러 개일 때만 적어요</p>')+
-    '<div class="hw-nbp"><span>저장될 이름</span><b id="hwNbp" class="'+(nm?'':'em')+'">'+(nm?esc(nm):'제조사를 골라 주세요')+'</b></div></div>';
+    '<h4>브랜드</h4><div class="gear-sug hw-bl">'+bl.map(b=>'<button type="button" class="gear-chip hw-bc" data-hw="nbb" data-g="'+esc(b)+'" aria-pressed="'+(!N.own&&N.b===b)+'">'+esc(b)+'</button>').join('')+'<button type="button" class="gear-chip hw-bc" data-hw="nbown" aria-pressed="'+N.own+'">직접 입력</button></div>'+
+    (N.own?'<input id="hwBIn" class="gear-in hw-in" maxlength="20" autocomplete="off" enterkeyhint="next" placeholder="브랜드 이름" value="'+esc(N.b)+'">':'')+
+    '<h4>기구명 <small>선택</small></h4>'+(N.open||N.m?'<input id="hwMIn" class="gear-in hw-in" maxlength="20" autocomplete="off" enterkeyhint="done" placeholder="예: 아이소 로우, 시티드 로우" value="'+esc(N.m)+'">':'<button type="button" class="cx-s hw-mo" data-hw="nbm">+ 기구명 적기</button><p class="hw-cap">같은 브랜드 안에서 기구가 여러 개일 때만 적어요</p>')+
+    '<div class="hw-nbp"><span>저장될 이름</span><b id="hwNbp" class="'+(nm?'':'em')+'">'+(nm?esc(nm):'브랜드를 골라 주세요')+'</b></div></div>';
   showSheet('새 기구 입력',h,[{id:'hwgtx',label:'취소',grow:1,fn:()=>{GS.nb=null;hwGearSheet(k,GS)}},{id:'hwgtok',label:'저장',primary:true,grow:1.6,fn:()=>hwNbSave()}]);
   requestAnimationFrame(()=>{const ok=document.querySelector('[data-sheet=hwgtok]');if(ok)ok.disabled=!N.b;const f=document.getElementById(N.own&&!N.b?'hwBIn':'hwMIn');if(f&&(N.own||N.open))f.focus()})}
 document.addEventListener('input',e=>{const id=e.target&&e.target.id;if(id==='hwBIn'||id==='hwMIn')hwNbIn()},true);
-function hwNbIn(){const N=GS&&GS.nb;if(!N)return;const b=document.getElementById('hwBIn'),m=document.getElementById('hwMIn');if(b)N.b=b.value.trim();if(m)N.m=m.value;const nm=N.b?(hwCanonB(N.b)+(N.m.trim()?' · '+N.m.trim():'')):'',p=document.getElementById('hwNbp'),ok=document.querySelector('[data-sheet=hwgtok]');if(p){p.textContent=nm||'제조사를 골라 주세요';p.className=nm?'':'em'}if(ok)ok.disabled=!N.b}
-function hwNbSave(){const N=GS&&GS.nb;if(!N)return;hwNbIn();if(!N.b){toast('제조사를 골라 주세요');return}N.b=hwCanonB(N.b);let v=N.b+(N.m.trim()?' · '+N.m.trim():'');if(GS.tool==='케이블'){GS.cb=v;GS.nb=null;GS.bopen=false;hwGearSheet(GS.k,GS);return}if(GS.tool==='스미스')v=hwJoinG('스미스',v,'');GS.nb=null;hideSheet();GS.typed=v;
+function hwNbIn(){const N=GS&&GS.nb;if(!N)return;const b=document.getElementById('hwBIn'),m=document.getElementById('hwMIn');if(b)N.b=b.value.trim();if(m)N.m=m.value;const nm=N.b?(hwCanonB(N.b)+(N.m.trim()?' · '+N.m.trim():'')):'',p=document.getElementById('hwNbp'),ok=document.querySelector('[data-sheet=hwgtok]');if(p){p.textContent=nm||'브랜드를 골라 주세요';p.className=nm?'':'em'}if(ok)ok.disabled=!N.b}
+function hwNbSave(){const N=GS&&GS.nb;if(!N)return;hwNbIn();if(!N.b){toast('브랜드를 골라 주세요');return}N.b=hwCanonB(N.b);let v=N.b+(N.m.trim()?' · '+N.m.trim():'');if(GS.tool==='케이블'){GS.cb=v;GS.nb=null;GS.bopen=false;hwGearSheet(GS.k,GS);return}if(GS.tool==='스미스')v=hwJoinG('스미스',v,'');GS.nb=null;hideSheet();GS.typed=v;
   const nm=canonGear(v),r=gRes(GS.k,nm),known=hwKnown(r),k=GS.k;hwSetGear(r);if(!known){hwAT(r+josa(r,'을','를')+' 추가했어요','고치기',()=>hwRename(k,r,{fromToast:true}));track('gear_added',{model:N.m.trim()?1:0})}}
 function hwSug(inp){const box=document.getElementById('hwGSug');if(!box||!GS)return;const q=gN(inp.value),{used,rest}=gearsFor(GS.k);
   const all=[...new Set(used.concat(rest).concat(hwGearNames(GS.k)).map(g=>canonGear(gRes(GS.k,g))))];
@@ -6151,18 +6237,18 @@ function hwRename(sc,g,o){o=o||{};if(!RN||RN.sc!==sc||RN.g!==g||RN.o!==o)RN={sc,
   if(N.b&&!N.own&&!bl.some(x=>gN(x)===gN(N.b)))bl.unshift(N.b);
   const nm=N.b?(N.b+(N.m.trim()?' · '+N.m.trim():'')):'';
   const body='<p class="hw-sub">'+esc(g)+' · 기록 '+recs+'개'+(sc!=='*'?' · '+esc(NAMES[sc]||''):' · 모든 종목')+'</p><div class="hw-nb">'+(N.guess?'<p class="hw-note">자동으로 나눠 봤어요. 맞는지 확인해 주세요</p>':'')+
-    '<h4>제조사</h4><div class="gear-sug hw-bl">'+bl.map(b=>'<button type="button" class="gear-chip hw-bc" data-hw="rnb" data-g="'+esc(b)+'" aria-pressed="'+(!N.own&&gN(N.b)===gN(b))+'">'+esc(b)+'</button>').join('')+'<button type="button" class="gear-chip hw-bc" data-hw="rnown" aria-pressed="'+N.own+'">직접 입력</button></div>'+
-    (N.own?'<input id="hwBIn" class="gear-in hw-in" maxlength="20" autocomplete="off" placeholder="제조사 이름" value="'+esc(N.b)+'">':'')+
-    '<h4>기구명 <small>선택</small></h4>'+(N.open||N.m?'<input id="hwMIn" class="gear-in hw-in" maxlength="20" autocomplete="off" placeholder="예: 아이소 로우, 시티드 로우" value="'+esc(N.m)+'">':'<button type="button" class="cx-s hw-mo" data-hw="rnm">+ 기구명 적기</button><p class="hw-cap">같은 제조사 안에서 기구가 여러 개일 때만 적어요</p>')+
-    '<div class="hw-nbp"><span>바뀔 이름</span><b id="hwNbp" class="'+(nm?'':'em')+'">'+(nm?esc(nm):'제조사를 골라 주세요')+'</b></div></div>'+
+    '<h4>브랜드</h4><div class="gear-sug hw-bl">'+bl.map(b=>'<button type="button" class="gear-chip hw-bc" data-hw="rnb" data-g="'+esc(b)+'" aria-pressed="'+(!N.own&&gN(N.b)===gN(b))+'">'+esc(b)+'</button>').join('')+'<button type="button" class="gear-chip hw-bc" data-hw="rnown" aria-pressed="'+N.own+'">직접 입력</button></div>'+
+    (N.own?'<input id="hwBIn" class="gear-in hw-in" maxlength="20" autocomplete="off" placeholder="브랜드 이름" value="'+esc(N.b)+'">':'')+
+    '<h4>기구명 <small>선택</small></h4>'+(N.open||N.m?'<input id="hwMIn" class="gear-in hw-in" maxlength="20" autocomplete="off" placeholder="예: 아이소 로우, 시티드 로우" value="'+esc(N.m)+'">':'<button type="button" class="cx-s hw-mo" data-hw="rnm">+ 기구명 적기</button><p class="hw-cap">같은 브랜드 안에서 기구가 여러 개일 때만 적어요</p>')+
+    '<div class="hw-nbp"><span>바뀔 이름</span><b id="hwNbp" class="'+(nm?'':'em')+'">'+(nm?esc(nm):'브랜드를 골라 주세요')+'</b></div></div>'+
     '<input id="hwRIn" type="hidden" value="'+esc(nm)+'"><p class="hw-err" id="hwRErr" hidden></p>'+
     '<p class="hw-cap">지난 기록의 기구 이름도 함께 바뀌어요. 무게 기록은 그대로예요</p>'+
     (ok.length?'<button type="button" class="hw-cb" data-hw="rnall" role="checkbox" aria-checked="'+RN.all+'"><i></i><span>다른 종목의 '+esc(g)+'도 함께 고치기 <small>'+ok.length+'종목</small></span></button>':'');
   hwFp('기구 이름 고치기',body,'<button type="button" class="cel-p" data-hw="rnok">이름 바꾸기</button>',{back:o.back})}
-function rnIn(){if(!RN||!RN.nb)return;const N=RN.nb,b=document.getElementById('hwBIn'),m=document.getElementById('hwMIn');if(b)N.b=b.value.trim();if(m)N.m=m.value;const nm=N.b?(hwCanonB(N.b)+(N.m.trim()?' · '+N.m.trim():'')):'',p=document.getElementById('hwNbp'),h=document.getElementById('hwRIn');if(p){p.textContent=nm||'제조사를 골라 주세요';p.className=nm?'':'em'}if(h)h.value=nm}
+function rnIn(){if(!RN||!RN.nb)return;const N=RN.nb,b=document.getElementById('hwBIn'),m=document.getElementById('hwMIn');if(b)N.b=b.value.trim();if(m)N.m=m.value;const nm=N.b?(hwCanonB(N.b)+(N.m.trim()?' · '+N.m.trim():'')):'',p=document.getElementById('hwNbp'),h=document.getElementById('hwRIn');if(p){p.textContent=nm||'브랜드를 골라 주세요';p.className=nm?'':'em'}if(h)h.value=nm}
 document.addEventListener('input',e=>{const id=e.target&&e.target.id;if((id==='hwBIn'||id==='hwMIn')&&RN&&document.getElementById('hwRIn'))rnIn()},true);
 function rnSubmit(){if(!RN)return;rnIn();const i=document.getElementById('hwRIn'),nn=String(i&&i.value||'').trim(),er=document.getElementById('hwRErr');
-  const err=m=>{if(er){er.textContent=m;er.hidden=false}};if(!nn){err('제조사를 골라 주세요');return}
+  const err=m=>{if(er){er.textContent=m;er.hidden=false}};if(!nn){err('브랜드를 골라 주세요');return}
   const {sc,g}=RN,n0=gN(g),n1=gN(nn),snap=JSON.stringify(GM);
   if(n0===n1){if(nn===g){fpClose();return}GM.disp=GM.disp||{};GM.disp[n1]=nn}
   else{const pool=sc==='*'?hwGearNames(null):hwGearNames(sc);const ex=pool.find(x=>gN(x)===n1);
@@ -6190,7 +6276,7 @@ function mgNo(){if(!MG)return;const key=[gN(MG.a),gN(MG.b)].sort().join('|');GM.
 /* 기록 탭 › 기구 이름 관리 */
 function hwGearMgr(){const m=new Map();sessions.forEach(s=>{for(const x in (s.entries||{})){const r=gRes(x,s.entries[x].gear||'');if(!r)continue;const n=gN(r),o=m.get(n)||{g:canonGear(r),keys:new Set(),c:0};o.keys.add(x);o.c++;m.set(n,o)}});
   const L=[...m.values()].sort((a,b)=>b.c-a.c),SP=hwSplitCands(L),LO=hwLooseAll();
-  const body=(LO.n?'<button type="button" class="hw-hint hw-lo" data-hw="glooseall"><span>도구 표시가 없는 지난 기록 '+LO.n+'개<small>무엇으로 했는지 정하면 기록이 이어져요</small></span><b>정하기 ›</b></button>':'')+(SP.length?'<button type="button" class="hw-hint" data-hw="gsplit"><span>옛 이름 '+SP.length+'개를 제조사 · 기구명으로 나눌 수 있어요</span><b>정리하기 ›</b></button>':'')+(L.length?'<div class="hw-list">'+L.map(o=>'<button type="button" class="hw-row" data-hw="gdet" data-g="'+esc(o.g)+'"><span class="t">'+esc(o.g)+'<small>'+o.keys.size+'종목 · 기록 '+o.c+'개</small></span>'+CHR+'</button>').join('')+'</div>':'<p class="hw-cap">아직 적어 둔 기구가 없어요. 종목 카드의 기구 칩에서 기구를 고르면 여기에 모여요.</p>');
+  const body=(LO.n?'<button type="button" class="hw-hint hw-lo" data-hw="glooseall"><span>도구 표시가 없는 지난 기록 '+LO.n+'개<small>무엇으로 했는지 정하면 기록이 이어져요</small></span><b>정하기 ›</b></button>':'')+(SP.length?'<button type="button" class="hw-hint" data-hw="gsplit"><span>옛 이름 '+SP.length+'개를 브랜드 · 기구명으로 나눌 수 있어요</span><b>정리하기 ›</b></button>':'')+(L.length?'<div class="hw-list">'+L.map(o=>'<button type="button" class="hw-row" data-hw="gdet" data-g="'+esc(o.g)+'"><span class="t">'+esc(o.g)+'<small>'+o.keys.size+'종목 · 기록 '+o.c+'개</small></span>'+CHR+'</button>').join('')+'</div>':'<p class="hw-cap">아직 적어 둔 기구가 없어요. 종목 카드의 기구 칩에서 기구를 고르면 여기에 모여요.</p>');
   hwFp('기구 이름 관리',body,'',{});track('gear_mgr',{})}
 /* 도구 표시가 없는 지난 기록(케이블·바벨·덤벨·맨몸이 가능한 종목만 — 머신은 기구를 고르면 이어져서 제외) */
 function hwLooseAll(){const by={};let n=0;sessions.forEach(s=>{for(const x in (s.entries||{})){const e=s.entries[x];if(e.gear||!entrySets(e).length)continue;if(!hwMach(x))continue;const A=hwAllow(x).filter(t=>t!=='머신'&&t!=='스미스');if(!A.length)continue;by[x]=(by[x]||0)+1;n++}});return{n,by}}
@@ -6200,7 +6286,7 @@ function hwSplitCands(L){const ex=new Set(L.map(o=>gN(o.g)));return L.map(o=>{co
 let SPL=null;
 function hwSplitAll(){const m=new Map();sessions.forEach(s=>{for(const x in (s.entries||{})){const r=gRes(x,s.entries[x].gear||'');if(!r)continue;const n=gN(r),o=m.get(n)||{g:canonGear(r),c:0};o.c++;m.set(n,o)}});
   if(!SPL)SPL={L:hwSplitCands([...m.values()]),off:new Set()};const{L,off}=SPL,on=L.length-off.size;
-  const body='<p class="hw-sub">이름이 \'제조사 기구명\'처럼 붙어 있는 기구를 찾았어요. 맞는 것만 남겨 주세요</p><div class="hw-list">'+L.map((x,i)=>'<button type="button" class="hw-cb hw-spr" data-hw="spt" data-i="'+i+'" role="checkbox" aria-checked="'+!off.has(i)+'"><i></i><span>'+esc(x.from)+'<small>→ '+esc(x.to)+(x.mg?' 기록과 합쳐져요':'')+' · 기록 '+x.c+'개</small></span></button>').join('')+'</div>'+
+  const body='<p class="hw-sub">이름이 \'브랜드 기구명\'처럼 붙어 있는 기구를 찾았어요. 맞는 것만 남겨 주세요</p><div class="hw-list">'+L.map((x,i)=>'<button type="button" class="hw-cb hw-spr" data-hw="spt" data-i="'+i+'" role="checkbox" aria-checked="'+!off.has(i)+'"><i></i><span>'+esc(x.from)+'<small>→ '+esc(x.to)+(x.mg?' 기록과 합쳐져요':'')+' · 기록 '+x.c+'개</small></span></button>').join('')+'</div>'+
     '<p class="hw-cap">지난 기록의 기구 이름도 함께 바뀌어요. 무게 기록은 그대로고, 하나씩 다시 고칠 수 있어요</p>';
   hwFp('기구 이름 정리',body,'<button type="button" class="cel-p" data-hw="spok"'+(on?'':' disabled')+'>'+on+'개 바꾸기</button>',{back:()=>{SPL=null;hwGearMgr()}})}
 function spOk(){if(!SPL)return;const snap=JSON.stringify(GM),A=GM.alias['*']=GM.alias['*']||{};let n=0;
@@ -6320,8 +6406,18 @@ setTimeout(verCheck,1500);document.addEventListener('visibilitychange',()=>{if(d
 /* ---------- 누르기 ---------- */
 const H={
   gear:b=>hwGearSheet(b.dataset.k,{mode:'live'}),
-  gback:()=>{if(!GS)return;const g=GS;if(g.step==='find'&&g.fromStep){g.step=g.fromStep;g.fromStep=null}else{g.step='tool'}hwGearSheet(g.k,g)},
-  gsel:b=>{if(!GS)return;GS.sel=b.dataset.b||'';hwGearSheet(GS.k,GS)},
+  gback:()=>{if(!GS)return;const g=GS;if(g.step==='conf'){hwNameSheet(g.k,g);return}if(g.step==='find'&&g.fromStep){g.step=g.fromStep;g.fromStep=null}else{g.step='tool'}hwGearSheet(g.k,g)},
+  gsel:b=>{if(!GS)return;GS.sel=b.dataset.b||'';hideSheet();hwSplitAsk(hwJoinG(GS.tool,GS.sel,''))},
+  gqname:b=>{const k=b.dataset.k,dv=curDraft(k),x=dv&&hwNmOf(gRes(k,dv.gear||''));if(!x)return;GS={k,mode:'live',br:x.br,nmFrom:'q7'};const v=b.dataset.v||'';
+    if(b.dataset.m){hwNameSheet(k,{nmv:v+' '});return}const full=hwJoinG('머신',hwCanonB(x.br)+' · '+v,'');GS.nmFull=full;track('gear_name',{from:'q7'});
+    if(hwBrOnlyRecs(k,x.br,state.logDate).length){hwConfSheet(k,GS);return}hwSplitAsk(full)},
+  gqnms:b=>{const k=b.dataset.k,dv=curDraft(k),x=dv&&hwNmOf(gRes(k,dv.gear||''));if(!x)return;GS={k,mode:'live',br:x.br,nmFrom:'q7'};hwNameSheet(k)},
+  gname:b=>{const k=b.dataset.k,dv=curDraft(k),x=dv&&hwNmOf(gRes(k,dv.gear||''));if(!x)return;GS={k,mode:'live',br:x.br,nmFrom:'chip'};hwNameSheet(k)},
+  gnlist:b=>{const k=b.dataset.k,dv=curDraft(k),x=dv&&hwNmOf(gRes(k,dv.gear||''));if(!x)return;hwNameList(k,x.br)},
+  gnnew:()=>{if(!GS||!GS.fb)return;const k=GS.k,br=GS.fb;GS={k,mode:'live',br,nmFrom:'list'};hwNameSheet(k)},
+  gnmfill:b=>{const i=document.getElementById('hwNmIn');if(!i)return;i.value=b.dataset.v||'';i.dispatchEvent(new Event('input'));try{i.focus()}catch(e){}},
+  gcft:b=>{if(!GS||!GS.cf)return;const id=b.dataset.id;GS.cf.has(id)?GS.cf.delete(id):GS.cf.add(id);hwConfSheet(GS.k,GS)},
+  gcfmore:()=>{if(!GS)return;GS.cfAll=true;hwConfSheet(GS.k,GS)},
   gfind:()=>{if(!GS)return;GS.fromStep=GS.step;GS.step='find';hwGearSheet(GS.k,GS)},
   gbr:b=>{if(!GS)return;const v=b.dataset.b===GUNK?GUNK:hwCanonB(b.dataset.b||'');if(GS.tool==='케이블'){GS.cb=v;GS.step='cable';GS.fromStep=null;hwGearSheet(GS.k,GS);return}hwSplitAsk(hwJoinG(GS.tool,v,''))},
   gcb:b=>{if(GS){GS.cb=b.dataset.b||'';hwGearSheet(GS.k,GS)}},
@@ -6697,7 +6793,7 @@ function addConfirm2(a){const P=PROGRAM[state.mode],lab=P?P.label:'루틴',xa=st
     if(sub){const p=document.createElement('p');p.className='hw-osub';p.textContent=sub.textContent;top.after(p);after=p}
     const gear=c.querySelector('.hw-gc'),req=c.querySelector('.hw-req'),gx=c.querySelector('.hint .gx-r'),lr=gx&&gx.querySelector('.lr');
     /* v128: 기구 칩 = 이름 바로 뒤(자리 없으면 이름 아래), 지난 기록 = 이름 아래 한 줄 + 같은 세트 묶기 */
-    const nm=top.querySelector(':scope>.card-name');if(nm&&(gear||req)){const eb=document.createElement('div');eb.className='hw-nm';nm.before(eb);eb.appendChild(nm);if(gear)eb.appendChild(gear);if(req)eb.appendChild(req)}
+    const nm=top.querySelector(':scope>.card-name');if(nm&&(gear||req)){const eb=document.createElement('div');eb.className='hw-nm';nm.before(eb);eb.appendChild(nm);if(gear)c.querySelectorAll('.hw-gc').forEach(x=>eb.appendChild(x));if(req)eb.appendChild(req)}
     if(lr){const bx=lr.querySelector('b');if(bx){const it=[...bx.querySelectorAll(':scope>i')],g=[];it.forEach(x=>{const t=x.textContent;if(g.length&&g[g.length-1].t===t)g[g.length-1].n++;else g.push({t,n:1})});
         bx.innerHTML=g.map(o=>'<i>'+esc(o.t)+(o.n>1?'<u class="hw-xg">×'+o.n+'</u>':'')+'</i>').join(' ')}
       const m=document.createElement('div');m.className='hw-last';m.appendChild(lr);after.after(m)}
@@ -7172,7 +7268,7 @@ document.getElementById('toast').addEventListener('click',e=>{if(!e.target.close
 .set-row input.rep.hw-over{border-color:var(--red)!important;background:var(--red-soft)!important;box-shadow:0 0 0 1px var(--red) inset;color:var(--red)!important}
 .set-row input.rep:focus:placeholder-shown+.hw-dch{display:none}
 </style>
-<!--HW-VER:v145-->
+<!--HW-VER:v149-->
 <!-- v142: 단위 고른 적 없는 종목은 마지막 기록 단위(lb)를 따름 · kg로 바꾸면 'kg'로 저장(HW-11 §8-1) -->
 <!-- v140: 개편 2차(M-314) — 도구 줄 의도 버튼(켜짐 파랑·상시 반짝임 / 꺼짐 회색·다시 켜기)·알아차림 토스트·[○○ 아니에요]·되돌린·미룬 기록 기준 무게(M-217·218)·무게 찾는 날 미루기·처음 켜질 때 도구 줄 스크롤(M-311)·지난 기록 줄 의도 이름(M-220)·세트별 문구(M-223). 저장 entries.iv('s:'·'u:'·'o:' + 이름, 'd') -->
 <!-- v139: +N 칩을 반복칸 안 오른쪽 가운데로(M-313, 재홍 19:38) — 무게 62·반복 72, 숫자 왼쪽 6, 칩 오른쪽 3 -->
@@ -7539,7 +7635,7 @@ function partView(){const L=exList(),g=RK.part==='전체'?L:L.filter(x=>partOf(x
    (L2.length?L2.slice().sort(S[RK.so]).map(x=>exRow(x)).join(''):'<p class="rk-empty">해당하는 종목이 없어요</p>')}
 /* ---------- 찾기 ---------- */
 function searchView(){const q=RK.q.trim(),L=exList().concat(keysAll().filter(k=>{const s=exStat(k);return s&&!s.in4}).map(k=>{const R=recs(k),H=history(k);return{k,in4:false,s:'flat',dv:0,cur:H[H.length-1],H}}));let b='';
-  if(!q)b='<p class="rk-empty">종목 이름·부위·제조사로 찾아요</p>';else{const by=L.filter(x=>exName(x.k).includes(q)||String(NAMES[x.k]).includes(q)),bp=P5.includes(q)?L.filter(x=>partOf(x.k)===q&&!by.includes(x)):[],bg=L.filter(x=>!by.includes(x)&&!bp.includes(x)&&buckets(x.k).some(bk=>dispG(bk.g).toLowerCase().includes(q.toLowerCase())||String(bk.g).includes(q)));
+  if(!q)b='<p class="rk-empty">종목 이름·부위·브랜드로 찾아요</p>';else{const by=L.filter(x=>exName(x.k).includes(q)||String(NAMES[x.k]).includes(q)),bp=P5.includes(q)?L.filter(x=>partOf(x.k)===q&&!by.includes(x)):[],bg=L.filter(x=>!by.includes(x)&&!bp.includes(x)&&buckets(x.k).some(bk=>dispG(bk.g).toLowerCase().includes(q.toLowerCase())||String(bk.g).includes(q)));
     if(by.length)b+='<div class="rk-grp">종목 이름</div>'+by.map(x=>exRow(x,q)).join('');if(bp.length)b+='<div class="rk-grp">'+esc(q)+' 부위</div>'+bp.map(x=>exRow(x)).join('');if(bg.length)b+='<div class="rk-grp">기구 \''+esc(q)+'\'</div>'+bg.map(x=>exRow(x)).join('');if(!b)b='<p class="rk-empty">\''+esc(q)+'\''+josa(q,'과','와')+' 맞는 종목이 없어요</p>'}
   return'<div class="rk-top"><button class="rk-bk" data-rk="back" aria-label="뒤로">'+BK+'</button><label class="rk-srch">'+SRC+'<input id="rkQ" placeholder="예: 가슴, Hammer, 프레스" autocomplete="off" value="'+esc(RK.q)+'"></label></div><div id="rkRes">'+b+'</div>'}
 /* ---------- 기구 고르기(모아 보기) ---------- */
@@ -7554,7 +7650,7 @@ function exView(){const k=RK.k,B=buckets(k),vis=B.filter(b=>b.g),none=B.find(b=>
     const H=history(k,undefined,gf),last=H[H.length-1],cut=RK.dp==='1m'?addDaysSafe(TODAY,-30):RK.dp==='3m'?addDaysSafe(TODAY,-91):'0',HP=H.filter(x=>x.date>=cut),dv=HP.length>1?HP[HP.length-1].weight-HP[0].weight:0;
     h+='<section class="rk-dcard"><div class="rk-dtop"><div><p>최근 최고 무게</p><strong>'+fmt(last?last.weight:cur.recs[0].w)+'<em>kg</em></strong></div>'+(dv>0?'<span class="rk-dpill">↑ '+fmt(dv)+'kg</span>':'')+'</div>'+
      '<div class="rk-gsw" role="tablist" aria-label="도구">'+tools.map(t=>'<button role="tab" data-rk="dt" data-t="'+t+'" aria-selected="'+(t===cur.o.t)+'">'+t+'</button>').join('')+'</div>'+
-     (HASBR(cur.o.t)?'<div class="rk-gsw2" role="tablist" aria-label="'+cur.o.t+' 제조사">'+sib.map(b=>'<button role="tab" data-rk="dg" data-g="'+esc(b.id)+'" aria-selected="'+(b.id===cur.id)+'">'+esc(lbl2(b,sib))+'</button>').join('')+'</div>'+
+     (HASBR(cur.o.t)?'<div class="rk-gsw2" role="tablist" aria-label="'+cur.o.t+' 브랜드">'+sib.map(b=>'<button role="tab" data-rk="dg" data-g="'+esc(b.id)+'" aria-selected="'+(b.id===cur.id)+'">'+esc(lbl2(b,sib))+'</button>').join('')+'</div>'+
       '<div class="rk-ginfo'+(cur.o.mn?'':' emp')+'"><span><small>기구 이름</small>'+(cur.o.mn?esc(cur.o.mn):'<em>없음</em>')+'</span><button data-rk="edit">정보 수정</button></div>':'')+
      '<div class="rk-ch" id="rkCh"><svg role="img" aria-label="'+esc(dispG(cur.g))+' 무게 추이. 점을 누르면 날짜와 무게가 보여요"></svg></div>'+
      '<div class="rk-dfoot"><span class="rk-dmeta"><i></i>최고 무게 갱신</span><span class="rk-per">'+[['1m','1개월'],['3m','3개월'],['all','전체']].map(([x,l])=>'<button data-rk="dp" data-p="'+x+'" aria-pressed="'+(RK.dp===x)+'">'+l+'</button>').join('')+'</span></div></section>';
@@ -7614,7 +7710,7 @@ function sheetOpen(title,body,acts,after2){showSheet(title,'<div class="rk-sh">'
 function cf(o){let v=document.getElementById('rkCf');if(!v){v=document.createElement('div');v.id='rkCf';v.className='rk-cf';v.setAttribute('role','dialog');v.setAttribute('aria-modal','true');document.body.appendChild(v)}hideSheet();
   v.innerHTML='<div class="rk-cfin"><div class="rk-top"><button class="rk-bk" id="rkCfb" aria-label="뒤로">'+BK+'</button></div><div class="rk-cfw"><p class="rk-cfeb">'+(o.eb||'')+'</p><h2>'+o.title+'</h2>'+(o.sub?'<p class="rk-cfs">'+o.sub+'</p>':'')+'<div class="rk-cfc">'+(o.body||'')+'</div></div><div class="rk-cff"><button id="rkCfx">취소</button><button class="pr" id="rkCfo">'+o.btn+'</button></div></div>';
   v.hidden=false;document.body.classList.add('rk-cfon');const close=()=>{v.hidden=true;document.body.classList.remove('rk-cfon')};
-  document.getElementById('rkCfb').onclick=document.getElementById('rkCfx').onclick=()=>{close();o.back&&o.back()};document.getElementById('rkCfo').onclick=()=>{close();o.go()};if(o.after)requestAnimationFrame(()=>o.after(v))}
+  document.getElementById('rkCfb').onclick=document.getElementById('rkCfx').onclick=()=>{close();o.back&&o.back()};document.getElementById('rkCfo').onclick=()=>{close();o.go()};v.onclick=e=>{if(e.target===v)close()};if(o.after)requestAnimationFrame(()=>o.after(v))}
 function preview(o){const ex=o.existing.map(x=>({...x,s:'b'})),ad=o.added.map(x=>({...x,s:'a'})),all=[...ex,...ad].sort((x,y)=>x.date<y.date?-1:1);let open=false;
   const body=()=>'<div class="rk-mdf"><div class="rk-mhd"><b>'+esc(o.target)+'</b><span class="rk-mct"><span>'+ex.length+'개</span><b>→ '+all.length+'개</b></span></div><div class="rk-mlg">'+(ex.length?'<span><i class="rk-sd b"></i>기존 '+ex.length+'개</span>':'')+'<span><i class="rk-sd a"></i>추가 '+ad.length+'개 <em>'+esc(o.from)+'</em></span></div>'+(all.length>1?'<svg class="rk-mcv" id="rkMcv" aria-hidden="true"></svg>':'')+'</div><button class="rk-mtg" id="rkMtg" aria-expanded="'+open+'">기록 '+all.length+'개 '+(open?'접기 ▴':'보기 ▾')+'</button>'+(open?'<div class="rk-mls">'+all.slice().reverse().map(x=>'<div><i class="rk-sd '+x.s+'"></i><time>'+md(x.date)+'</time><span><b>'+fmt(x.w)+'</b>kg × '+x.r.join(' · ')+'</span>'+(x.s==='a'?'<em class="rk-tg">추가</em>':'')+'</div>').join('')+'</div>':'');
   const aft=v=>{v.querySelector('#rkMtg').onclick=()=>{open=!open;v.querySelector('.rk-cfc').innerHTML=body();aft(v)};const sv=v.querySelector('#rkMcv');if(!sv)return;const W=sv.clientWidth||300,H=sv.clientHeight||96,t=d=>new Date(d+'T00:00:00').getTime(),x0=t(all[0].date),x1=t(all[all.length-1].date),ws=all.map(x=>x.w),lo=Math.min(...ws),hi=Math.max(...ws),pd=Math.max(2.5,(hi-lo)*.2);
@@ -7641,27 +7737,27 @@ function confirmMove(ids,g,exist,fromNone,isNew){const R=ids.map(recOf).filter(B
   preview({eb:fromNone?'기구 고르기':'기구 수정',title:'기록 '+ids.length+'개를<br>'+(fromNone?'이 기구로 정할까요?':'이 기구로 옮길까요?'),sub:isNew?'새 기구로 따로 쌓여요':'기존 기록 '+exist.filter(x=>!ids.includes(x.id)).length+'개에 더해져요',target:dispG(g),existing:isNew?[]:exist.filter(x=>!ids.includes(x.id)),added:R,from:src.join(', '),btn:fromNone?'정하기':'옮기기',back:()=>gearSheet(ids),go:()=>setGear(ids,g)})}
 function allowT(k){try{return hwAllowU(k)}catch(e){return['머신','케이블','스미스','바벨','덤벨']}}
 function pickTool(k,cur,title,onBack,onPick){const T=allowT(k);sheetOpen(title,'<div class="rk-tlr">'+T.map(t=>'<button class="rk-tl'+(t===cur?' on':'')+'" data-tl="'+t+'"'+(t===cur?' aria-current="true"':'')+'>'+t+'</button>').join('')+'</div>',[{id:'rkSb',label:'뒤로',grow:1,fn:onBack}],el=>el.querySelectorAll('[data-tl]').forEach(x=>x.onclick=()=>x.dataset.tl===cur?onBack():onPick(x.dataset.tl)))}
-function pickBrand(cur,onBack,onPick){sheetOpen('제조사','<input class="rk-inp" id="rkBq" placeholder="영문·한글로 찾기" autocomplete="off"><div id="rkBl"></div>',[{id:'rkSb',label:'뒤로',grow:1,fn:onBack}],el=>{const draw=()=>{const q=gearNorm(el.querySelector('#rkBq').value);const L=HWBR_L.filter(([e,k])=>!q||gearNorm(e).includes(q)||gearNorm(k).includes(q));
-  el.querySelector('#rkBl').innerHTML=L.map(x=>{const st=hwBrSt2(x),on=cur&&gearNorm(hwBrSt2(hwBrPair(cur)))===gearNorm(st);return'<button class="rk-opt" data-br="'+esc(st)+'"><span class="rk-ot">'+x[0]+'<small>'+x[1]+'</small></span>'+(on?'<span class="rk-ck" aria-label="지금 제조사"></span>':'')+'</button>'}).join('')+'<button class="rk-opt" data-brx="1"><span class="rk-ot" style="color:var(--accent-ink)">목록에 없어요 · 직접 입력</span>'+CHV+'</button>';
-  el.querySelectorAll('[data-br]').forEach(x=>x.onclick=()=>onPick(x.dataset.br));el.querySelector('[data-brx]').onclick=()=>textIn('제조사 직접 입력','',(el.querySelector('#rkBq')||{value:''}).value,()=>pickBrand(cur,onBack,onPick),v=>onPick(v))};el.querySelector('#rkBq').oninput=draw;draw()})}
+function pickBrand(cur,onBack,onPick){sheetOpen('브랜드','<input class="rk-inp" id="rkBq" placeholder="영문·한글로 찾기" autocomplete="off"><div id="rkBl"></div>',[{id:'rkSb',label:'뒤로',grow:1,fn:onBack}],el=>{const draw=()=>{const q=gearNorm(el.querySelector('#rkBq').value);const L=HWBR_L.filter(([e,k])=>!q||gearNorm(e).includes(q)||gearNorm(k).includes(q));
+  el.querySelector('#rkBl').innerHTML=L.map(x=>{const st=hwBrSt2(x),on=cur&&gearNorm(hwBrSt2(hwBrPair(cur)))===gearNorm(st);return'<button class="rk-opt" data-br="'+esc(st)+'"><span class="rk-ot">'+x[0]+'<small>'+x[1]+'</small></span>'+(on?'<span class="rk-ck" aria-label="지금 브랜드"></span>':'')+'</button>'}).join('')+'<button class="rk-opt" data-brx="1"><span class="rk-ot" style="color:var(--accent-ink)">목록에 없어요 · 직접 입력</span>'+CHV+'</button>';
+  el.querySelectorAll('[data-br]').forEach(x=>x.onclick=()=>onPick(x.dataset.br));el.querySelector('[data-brx]').onclick=()=>textIn('브랜드 직접 입력','',(el.querySelector('#rkBq')||{value:''}).value,()=>pickBrand(cur,onBack,onPick),v=>onPick(v))};el.querySelector('#rkBq').oninput=draw;draw()})}
 function textIn(title,hint,val,onBack,onSave,o){o=o||{};TI.v=val||'';sheetOpen(title,(hint?'<p class="rk-shs">'+hint+'</p>':'')+'<input class="rk-inp" id="rkTi" autocomplete="off" value="'+esc(val||'')+'" placeholder="'+esc(o.ph||'')+'">'+(o.sug&&o.sug.length?'<div class="rk-sgc">'+o.sug.map(u=>'<button data-us="'+esc(u)+'">'+esc(u)+'</button>').join('')+'</div>':'')+'<p class="rk-hint" id="rkTh"></p>',[{id:'rkTb',label:'취소',grow:1,fn:onBack},{id:'rkTs',label:o.btn||'저장',primary:true,grow:1.6,fn:()=>{const v=String(TI.v).replace(/\s+/g,' ').trim();if(!v&&!o.empty)return;onSave(v)}}],el=>{const i=el.querySelector('#rkTi');i.addEventListener('input',()=>{TI.v=i.value});el.querySelectorAll('[data-us]').forEach(x=>x.onclick=()=>{i.value=x.dataset.us;TI.v=i.value;o.chk&&o.chk(i.value)});if(o.chk){i.oninput=()=>o.chk(i.value);o.chk(i.value)}setTimeout(()=>i.focus(),50)})}
 function newGear(ids,fromNone){const k=RK.k,back=()=>gearSheet(ids);
   const fin=no=>{const g=gj(no),ex=buckets(k).find(b=>b.g&&b.n===gearNorm(gRes(k,g))||(b.g&&gearNorm(b.g)===gearNorm(g)));if(ex){confirmMove(ids,ex.g,ex.recs,fromNone,false);return}confirmMove(ids,g,[],fromNone,true)};
-  pickTool(k,null,'새 기구 추가 · 도구',back,t=>{if(!HASBR(t)){fin({t,br:'',mn:'',h:''});return}pickBrand(null,()=>newGear(ids,fromNone),br=>textIn('기구 이름','모르면 비워 두세요. 제조사로만 구분해요','',()=>newGear(ids,fromNone),mn=>fin({t,br,mn,h:''}),{ph:'예: 아이소 래터럴',btn:'다음',empty:true}))})}
+  pickTool(k,null,'새 기구 추가 · 도구',back,t=>{if(!HASBR(t)){fin({t,br:'',mn:'',h:''});return}pickBrand(null,()=>newGear(ids,fromNone),br=>textIn('기구 이름','모르면 비워 두세요. 브랜드로만 구분해요','',()=>newGear(ids,fromNone),mn=>fin({t,br,mn,h:''}),{ph:'예: 아이소 래터럴',btn:'다음',empty:true}))})}
 /* ---------- 기구 정보 수정(묶음) ---------- */
 function curB(){return buckets(RK.k).find(b=>b.id===RK.dg)}
 function editGear(){const b=curB();if(!b)return;const o=b.o,custom=o.br&&!HWBR_L.some(x=>gearNorm(hwBrSt2(x))===gearNorm(o.br));
-  sheetOpen('기구 정보 수정','<p class="rk-shs">이 기구로 남긴 기록 '+b.recs.length+'개에 함께 적용돼요</p><button class="rk-opt rk-er" data-ef="tool"><span class="rk-ek">도구</span><span class="rk-ev">'+o.t+'</span>'+CHV+'</button>'+(HASBR(o.t)?'<button class="rk-opt rk-er" data-ef="br"><span class="rk-ek">제조사</span><span class="rk-ev">'+(o.br?esc(brEn(o.br)):'<em>없음</em>')+(custom?'<i class="rk-tg">직접 입력</i>':'')+'</span>'+CHV+'</button><button class="rk-opt rk-er" data-ef="mn"><span class="rk-ek">기구 이름</span><span class="rk-ev">'+(o.mn?esc(o.mn):'<em>없음</em><i class="rk-tg ad">추가하기</i>')+'</span>'+CHV+'</button>':''),null,
+  sheetOpen('기구 정보 수정','<p class="rk-shs">이 기구로 남긴 기록 '+b.recs.length+'개에 함께 적용돼요</p><button class="rk-opt rk-er" data-ef="tool"><span class="rk-ek">도구</span><span class="rk-ev">'+o.t+'</span>'+CHV+'</button>'+(HASBR(o.t)?'<button class="rk-opt rk-er" data-ef="br"><span class="rk-ek">브랜드</span><span class="rk-ev">'+(o.br?esc(brEn(o.br)):'<em>없음</em>')+(custom?'<i class="rk-tg">직접 입력</i>':'')+'</span>'+CHV+'</button><button class="rk-opt rk-er" data-ef="mn"><span class="rk-ek">기구 이름</span><span class="rk-ev">'+(o.mn?esc(o.mn):'<em>없음</em><i class="rk-tg ad">추가하기</i>')+'</span>'+CHV+'</button>':''),null,
    el=>el.querySelectorAll('[data-ef]').forEach(x=>x.onclick=()=>{const f=x.dataset.ef;if(f==='tool')pickTool(RK.k,o.t,'기구 정보 수정 · 도구',editGear,t=>toolEdit(b,t));if(f==='br')pickBrand(o.br,editGear,n=>brandPick(b,n));if(f==='mn')nameEdit(b)}))}
 function sameB(b,no){const to=gearNorm(gj(no));return buckets(RK.k).find(x=>x!==b&&x.g&&x.n===to)}
 function applyEdit(b,patch,note){const no=Object.assign({},b.o,patch),same=sameB(b,no);
   if(same){mergeCf(b,same,no,note);return}renameBucket(b,no,'기록을 수정했어요')}
 function mergeCf(b,same,no,note,extra){preview({eb:'기구 정보 수정',title:'기존 기록에<br>합칠까요?',sub:(note?note+' ':'')+'수정하면 같은 기구가 돼서, 기록 '+b.recs.length+'개가 기존 기록 '+same.recs.length+'개에 더해져요',target:dispG(same.g),existing:same.recs,added:b.recs,from:dispG(b.g),btn:'합치기',back:editGear,go:()=>{if(!canSave())return;const j=gmBackup();aliasSet(RK.k,b.g,same.g);if(extra)extra();gmSave();RK.dg=same.n;rer(false);toast('기록을 합쳤어요',{label:'되돌리기',fn:gmUndo(j)})}})}
 function toolEdit(b,t){const lose=!HASBR(t)&&(b.o.br||b.o.mn),no={t,br:HASBR(t)?b.o.br:'',mn:HASBR(t)?b.o.mn:'',h:''};
-  if(lose&&!sameB(b,no)){cf({eb:'기구 정보 수정',title:'도구를<br>'+t+josaRo(t)+' 수정할까요?',sub:t+'에는 제조사·기구 이름 칸이 없어서 \''+esc(dispG(b.g))+'\' 정보는 지워져요. 기록은 그대로 남아요',btn:'수정하기',back:editGear,go:()=>renameBucket(b,no,'기록을 수정했어요')});return}
-  applyEdit(b,no,lose?'\''+esc(dispG(b.g))+'\'의 제조사·기구 이름은 지워져요.':'')}
+  if(lose&&!sameB(b,no)){cf({eb:'기구 정보 수정',title:'도구를<br>'+t+josaRo(t)+' 수정할까요?',sub:t+'에는 브랜드·기구 이름 칸이 없어서 \''+esc(dispG(b.g))+'\' 정보는 지워져요. 기록은 그대로 남아요',btn:'수정하기',back:editGear,go:()=>renameBucket(b,no,'기록을 수정했어요')});return}
+  applyEdit(b,no,lose?'\''+esc(dispG(b.g))+'\'의 브랜드·기구 이름은 지워져요.':'')}
 function brandPick(b,n){const C=buckets(RK.k).filter(x=>x!==b&&x.g&&x.o.t===b.o.t&&gearNorm(x.o.br)===gearNorm(n));if(!C.length){brandEdit(b,n);return}
-  sheetOpen('어느 '+esc(brEn(n))+' 기구예요?','<p class="rk-shs">'+b.o.t+'에서 이미 쓴 '+esc(brEn(n))+' 기구예요</p>'+C.map(c=>'<button class="rk-opt" data-cd="'+esc(c.id)+'"><span class="rk-ot">'+esc(dispG(c.g))+'<small>기록 '+c.recs.length+'개</small></span></button>').join('')+'<button class="rk-opt" data-cd="__"><span class="rk-ot">목록에 없는 기구예요<small>'+(b.o.mn?'기구 이름 \''+esc(b.o.mn)+'\' 그대로 두고 제조사만 수정해요':'제조사만 수정하고 따로 쌓여요')+'</small></span></button>',[{id:'rkSb',label:'취소',grow:1,fn:editGear}],
+  sheetOpen('어느 '+esc(brEn(n))+' 기구예요?','<p class="rk-shs">'+b.o.t+'에서 이미 쓴 '+esc(brEn(n))+' 기구예요</p>'+C.map(c=>'<button class="rk-opt" data-cd="'+esc(c.id)+'"><span class="rk-ot">'+esc(dispG(c.g))+'<small>기록 '+c.recs.length+'개</small></span></button>').join('')+'<button class="rk-opt" data-cd="__"><span class="rk-ot">목록에 없는 기구예요<small>'+(b.o.mn?'기구 이름 \''+esc(b.o.mn)+'\' 그대로 두고 브랜드만 수정해요':'브랜드만 수정하고 따로 쌓여요')+'</small></span></button>',[{id:'rkSb',label:'취소',grow:1,fn:editGear}],
    el=>el.querySelectorAll('[data-cd]').forEach(x=>x.onclick=()=>{if(x.dataset.cd==='__'){brandEdit(b,n);return}const c=C.find(y=>y.id===x.dataset.cd);mergeCf(b,c,c.o,'')}))}
 /* 같은 제조사 이름을 쓴 다른 종목(HW-12 §7: 범위는 그 종목, 다른 종목은 골라서 함께) */
 function othersOf(k,br){const out=[];if(!br)return out;for(const k2 of keysAll()){if(k2===k)continue;for(const bk of buckets(k2)){if(bk.g&&gearNorm(bk.o.br)===gearNorm(br)){const L=bk.recs[0];out.push({k:k2,b:bk,n:bk.recs.length,d:L.date,w:L.w})}}}return out}
@@ -7669,11 +7765,11 @@ function brandEdit(b,n){const O=othersOf(RK.k,b.o.br),no=Object.assign({},b.o,{b
   const ck=new Set(),L0=b.recs[0];const row=(i,nm,bk,cnt,d,w,me)=>'<button class="rk-orw" '+(me?'disabled aria-checked="true"':'data-oi="'+i+'" aria-checked="'+ck.has(i)+'"')+' role="checkbox"><span class="rk-cb'+(me||ck.has(i)?' on':'')+(me?' lk':'')+'" aria-hidden="true"></span><span class="rk-m"><b>'+esc(nm)+(me?'<i class="rk-tg">지금 종목</i>':'')+'</b><small>'+bk.o.t+' · <em class="rk-old">'+esc(brEn(bk.o.br))+'</em> · '+esc(bk.o.mn||'기구 이름 없음')+'</small></span><span class="rk-r"><b>기록 '+cnt+'개</b><small>최근 '+md(d)+' · '+fmt(w)+'kg</small></span></button>';
   const draw=()=>{const K=O.filter((o,i)=>ck.has(i)),body='<div class="rk-cto"><span>'+esc(brEn(b.o.br))+'</span><b>→ '+esc(brEn(n))+'</b></div><div class="rk-ols">'+row(-1,exName(RK.k),b,b.recs.length,L0.date,L0.w,true)+O.map((o,i)=>row(i,exName(o.k),o.b,o.n,o.d,o.w)).join('')+'</div>';
     const extra=()=>K.forEach(o=>aliasSet(o.k,o.b.g,gj(Object.assign({},o.b.o,{br:n}))));
-    cf({eb:'제조사 수정',title:'다른 기록도<br>함께 수정할까요?',sub:'\''+esc(brEn(b.o.br))+'\''+josaRo(brEn(b.o.br))+' 남긴 기록이 다른 종목에도 있어요',body,btn:(K.length?(K.length+1)+'개 종목':esc(exName(RK.k)))+' 기록 수정하기',back:editGear,
+    cf({eb:'브랜드 수정',title:'다른 기록도<br>함께 수정할까요?',sub:'\''+esc(brEn(b.o.br))+'\''+josaRo(brEn(b.o.br))+' 남긴 기록이 다른 종목에도 있어요',body,btn:(K.length?(K.length+1)+'개 종목':esc(exName(RK.k)))+' 기록 수정하기',back:editGear,
       go:()=>{const same=sameB(b,no);if(same){mergeCf(b,same,no,'',extra);return}if(!canSave())return;const j=gmBackup();aliasSet(RK.k,b.g,gj(no));extra();gmSave();RK.dg=gearNorm(gj(no));rer(false);toast('기록을 수정했어요',{label:'되돌리기',fn:gmUndo(j)})},
       after:v=>v.querySelectorAll('[data-oi]').forEach(x=>x.onclick=()=>{const i=+x.dataset.oi;ck.has(i)?ck.delete(i):ck.add(i);draw()})})};draw()}
 function nameEdit(b){const used=[...new Set(buckets(RK.k).filter(x=>x!==b&&x.o.mn).map(x=>x.o.mn))];
-  textIn('기구 이름','비워 두면 제조사로만 구분해요',b.o.mn,editGear,v=>{const no=Object.assign({},b.o,{mn:v});if(gearNorm(v)===gearNorm(b.o.mn)){hideSheet();return}applyEdit(b,{mn:v})},{ph:'예: 아이소 래터럴',sug:used,empty:true,
+  textIn('기구 이름','비워 두면 브랜드로만 구분해요',b.o.mn,editGear,v=>{const no=Object.assign({},b.o,{mn:v});if(gearNorm(v)===gearNorm(b.o.mn)){hideSheet();return}applyEdit(b,{mn:v})},{ph:'예: 아이소 래터럴',sug:used,empty:true,
     chk:v=>{const s=sameB(b,Object.assign({},b.o,{mn:v.replace(/\s+/g,' ').trim()})),h=document.getElementById('rkTh'),btn=document.querySelector('#sheet [data-sheet="rkTs"]');if(!h||!btn)return;if(s){btn.textContent='합치기';h.className='rk-hint mg';h.textContent=dispG(s.g)+josa(dispG(s.g),'이','가')+' 이미 있어요. 합치면 기록 '+(b.recs.length+s.recs.length)+'개가 한 그래프로 이어져요'}else{btn.textContent='저장';h.className='rk-hint';h.textContent=''}}})}
 /* ---------- 이벤트 ---------- */
 function sortSheet(){sheetOpen('정렬',Object.entries(SL).map(([k,l])=>'<button class="rk-opt" data-so="'+k+'"><span class="rk-ot">'+l+'<small>'+({up:'증량한 종목 먼저, 많이 증량한 순서',recent:'최근에 기록한 종목 먼저',name:'가나다 순서'})[k]+'</small></span>'+(RK.so===k?'<span class="rk-ck" aria-label="지금 정렬"></span>':'')+'</button>').join(''),null,el=>el.querySelectorAll('[data-so]').forEach(x=>x.onclick=()=>{RK.so=x.dataset.so;hideSheet();rer(false)}))}
@@ -7702,5 +7798,98 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-rkgo]');if
 window.hwRkGo=(o)=>{state.main='cal';RK.seg='ex';RK.sel.clear();Object.assign(RK,{v:'front',back:[],lf:'all',dp:'3m',dg:null,ft:'all'},o||{});render();window.scrollTo(0,0)};
 })();
 
+</script>
+<style id="hw-v146">
+/* v146 기구 고르기 통합(시안 2026-11-24) — 빈 칩 파랑·빛남(B2), 이름 칩(D5·D6), 질문 답 줄(R1·M1), 이름 칸·예전 기록 확인(I1·C1) */
+.gear-chip.hw-gc.em{background:rgba(61,124,253,.16)!important;border-color:rgba(61,124,253,.55)!important;color:var(--accent-ink)!important;position:relative;overflow:hidden}
+.gear-chip.hw-gc.em svg{color:var(--accent-ink)!important}
+.gear-chip.hw-gc.em::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,rgba(255,255,255,0) 35%,rgba(160,196,255,.35) 50%,rgba(255,255,255,0) 65%);background-size:220% 100%;background-repeat:no-repeat;background-position:120% 0;animation:hwEmG 6s ease-in-out .3s infinite;pointer-events:none}
+@keyframes hwEmG{0%{background-position:120% 0}40%{background-position:-120% 0}100%{background-position:-120% 0}}
+@media (prefers-reduced-motion:reduce){.gear-chip.hw-gc.em::after{animation:none;display:none}}
+.gear-chip.hw-gc.hw-nn{background:transparent!important;border:1px dashed var(--line)!important;color:var(--ink-3)!important}
+.hw-qr{display:flex;flex-wrap:wrap;gap:6px;width:100%}
+.gq-a:has(.hw-qr){flex-wrap:wrap;row-gap:10px}
+.gq-a .hw-qa{height:36px;border-radius:999px!important;padding:0 14px!important;background:var(--ink)!important;color:var(--bg)!important;font-weight:700!important;display:inline-flex;align-items:center;gap:6px}
+.gq-a .hw-qa.hw-qo{background:rgba(255,255,255,.08)!important;color:var(--ink)!important}
+.hw-lt{font-style:normal;font-size:11px;font-weight:700;padding:1px 6px;border-radius:6px;background:rgba(61,124,253,.16);color:#2563EB}
+.gq-a .gq-l{margin-left:0!important;margin-right:auto}
+.gq-a .gq-p{margin-left:auto}
+.hw-nmw{display:flex;flex-direction:column;gap:8px}
+.hw-nmf{display:flex;align-items:center;gap:0;height:52px;border-radius:12px;border:1.5px solid #3D7CFD;background:var(--fill);padding:0 12px}
+.hw-nmp{flex:none;color:var(--ink-3);font-weight:600;font-size:15px;padding-right:10px;margin-right:10px;border-right:1px solid var(--line);line-height:20px}
+#hwNmIn{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:600 16px inherit;font-family:inherit;outline:none;height:100%}
+.hw-nmh{margin:0;font-size:13px;color:var(--green)}
+.hw-nml{display:flex;flex-direction:column;border-radius:12px;overflow:hidden;background:var(--fill)}
+.hw-nml:empty{display:none}
+.hw-nmo{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:48px;padding:8px 12px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;font-family:inherit}
+.hw-nmo:last-child{border-bottom:0}.hw-nmo b{font-size:15px;font-weight:600}.hw-nmo small{font-size:12px;color:var(--ink-3)}
+.hw-cfl{display:flex;flex-direction:column;gap:2px;border-radius:12px;background:var(--fill);padding:6px 12px}
+.hw-cfr{display:flex;align-items:center;gap:10px;min-height:40px;border:0;background:transparent;color:var(--ink);font-family:inherit;font-size:14px;padding:0;text-align:left}
+.hw-cfr span{color:var(--ink-3)}.hw-cfr b{margin-left:auto;font-weight:700}
+.hw-cb{flex:none;width:22px;height:22px;border-radius:6px;background:#3D7CFD;display:grid;place-items:center}
+.hw-cb::after{content:"";width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.hw-cfr.off .hw-cb{background:transparent;border:1.5px solid var(--ink-3)}.hw-cfr.off .hw-cb::after{display:none}
+.hw-cfr.off span,.hw-cfr.off b{color:var(--ink-3);text-decoration:line-through}
+.hw-cft{border-bottom:1px solid var(--line);padding-bottom:4px;margin-bottom:2px}.hw-cft span,.hw-cft b{color:var(--accent-ink)}
+.hw-cfm{border:0;background:transparent;color:var(--accent-ink);font:600 13px inherit;font-family:inherit;min-height:36px}
+#sheet [data-sheet].hw-dis{opacity:.4}
+/* N4: 기록 탭 종류 칩 = 테두리형(운동 탭 T1과 같은 모양) */
+.rk-tc{background:transparent!important;border:1px solid #6B6D73!important;color:#C2C4C8!important}
+.hw-cfr b,.hw-cft b{font-size:14px!important;line-height:20px}
+/* N3: 기록 탭 확인 = 아래에서 올라오는 시트 */
+.rk-cf{background:rgba(0,0,0,.6)!important;display:flex;align-items:flex-end;justify-content:center;overflow:hidden!important}
+.rk-cf[hidden]{display:none!important}
+.rk-cfin{width:100%;max-width:520px!important;min-height:0!important;max-height:90vh;overflow-y:auto;margin:0!important;background:var(--surface);border-radius:24px 24px 0 0;padding:8px max(20px,env(safe-area-inset-right,0px)) 0 max(20px,env(safe-area-inset-left,0px))!important}
+.rk-cfin .rk-top{min-height:0;height:auto;padding:6px 0 0}
+.rk-cfw{text-align:left!important;padding-top:4px!important}
+.rk-cfw h2{font-size:20px!important;line-height:28px!important}
+.rk-cfs{margin:8px 0 0!important;max-width:none!important}
+.rk-cff{background:linear-gradient(rgba(37,38,41,0),var(--surface) 28%)!important}
+</style>
+<style id="hw-v147">.gq-a{justify-content:flex-end}.gq-a .hw-qr{order:-2}.gq-a .gq-l{order:-1;margin-left:0!important;margin-right:auto!important}.gq-a .gq-p{margin-left:0!important;order:1}.gq-a .hw-qr{justify-content:flex-end}</style><style id="hw-v148">
+/* v148(2026-11-25 재홍 '적용해줘'): 질문 말풍선 공통 틀 — HW-31 §8
+   ① 맥락 줄 = 숨긴 기구 칩 정보(브랜드·이름), 제목에 이미 있으면 생략 · 종목 이름은 넣지 않음(카드 제목과 중복)
+   ② 배치는 질문 종류로: 답을 고르는 질문(후보·[그 외 ›]) = 항상 세로 목록(폭 전체, 회색), 아래 줄 [다음에] 왼쪽·[그 외 ›] 오른쪽
+      행동하는 질문 = 항상 가로 한 줄([다음에] 왼쪽, 행동 버튼 오른쪽 · 가장 중요한 버튼이 오른쪽 끝)
+   ③ 행동 버튼 최대 3개(후보 2 + 그 외), 버튼 글자는 자르지 않음, 버튼 줄은 말풍선 폭 전체 */
+.gq-cx{display:block;font-style:normal;font-size:12px;line-height:16px;font-weight:600;color:#C9DDFF;word-break:keep-all}
+.gq-a.v148{padding-left:0!important;display:flex;align-items:center;gap:8px;flex-wrap:wrap!important;row-gap:8px;justify-content:flex-start!important}
+.gq-a.v148>.gq-l{order:0!important;margin:0 auto 0 0!important;flex:none}
+.gq-a.v148>.gq-r{display:flex;flex-direction:row-reverse;flex-wrap:wrap-reverse;justify-content:flex-start;gap:8px;margin-left:auto;align-items:center;max-width:100%}
+.gq-a.v148>.gq-r>button{flex:none;white-space:nowrap;margin:0!important;order:0!important;max-width:100%}
+.gq-a.v148 .hw-qa{height:36px;border-radius:10px!important;padding:0 12px!important;background:rgba(255,255,255,.08)!important;color:var(--ink)!important;font-weight:600!important;display:inline-flex;align-items:center;gap:6px}
+.gq-a.v148 .hw-lt{background:rgba(61,124,253,.24);color:#9CC8FF;flex:none;line-height:16px}
+.gq-a.v148.gq-pick{display:grid!important;grid-template-columns:minmax(0,1fr) auto;row-gap:8px;column-gap:8px}
+.gq-a.v148.gq-pick>.gq-r{display:contents}
+.gq-a.v148.gq-pick>.gq-r>button{order:var(--o)!important}
+.gq-a.v148.gq-pick>.gq-r>button:not(.hw-qo){grid-column:1/-1;width:100%;display:flex;justify-content:space-between;text-align:left;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;height:auto!important;min-height:36px;padding:8px 12px!important;line-height:20px}
+.gq-a.v148.gq-pick>.gq-l{order:50!important;grid-column:1;justify-self:start}
+.gq-a.v148.gq-pick>.gq-r>.hw-qo{order:51!important;grid-column:2;justify-self:end}
+</style>
+<script id="hw-v148js">
+/* v148: 질문 말풍선(hwGQ·hwForceUI) 결과를 공통 틀로 다시 짠다. 판단 말풍선(.hw-jd)은 건드리지 않음 */
+(function(){
+  const brL=x=>{try{const p=window.hwBrPair?hwBrPair(x.br)[0]:x.br;return hwBrChip(p||x.br)}catch(e){return x.br}};
+  const ctxOf=(k,dv)=>{try{const g=dv&&dv.gear?gRes(k,dv.gear):'';if(!g)return '';const x=hwNmOf(g);return x?brL(x)+(x.nm?' '+x.nm:''):hwChipLbl(k,g)}catch(e){return ''}};
+  function fix(html,k,dv){if(!html||html.indexOf('gq-bub')<0||html.indexOf('hw-jd')>=0)return html;
+    const t=document.createElement('template');t.innerHTML=html;const b=t.content.querySelector('.gq-bub');if(!b)return html;
+    const sp=b.querySelector('.gq-m>span');
+    if(sp&&!sp.querySelector('.gq-cx')){const cx=ctxOf(k,dv),tt=(b.querySelector('.gq-m b')||{}).textContent||'',hit=cx&&cx.split(' ').some(w=>w.length>2&&tt.indexOf(w)>=0);
+      if(cx&&!hit){const e=document.createElement('em');e.className='gq-cx';e.textContent=cx;sp.insertBefore(e,sp.firstChild)}}
+    const a=b.querySelector('.gq-a');if(!a)return t.innerHTML;
+    const later=a.querySelector('.gq-l');let more=a.querySelector('.hw-qo');
+    const cands=[...a.querySelectorAll('.hw-qa:not(.hw-qo)')].slice(0,2);
+    const others=[...a.querySelectorAll('button')].filter(x=>x!==later&&x!==more&&!x.classList.contains('hw-qa'));
+    if(!cands.length&&more){/* v149: 후보가 없으면 고를 것이 없음 → 행동 버튼 하나 */more.classList.remove('hw-qa','hw-qo','gq-s');more.classList.add('gq-p');more.textContent=more.dataset.hw==='gqnms'?'이름 적기':'고르기';others.push(more);more=null}
+    const pri=cands.concat(others);if(more)pri.push(more);
+    pri.forEach((x,i)=>x.style.setProperty('--o',String(x===more?51:i)));
+    const r=document.createElement('div');r.className='gq-r';pri.forEach(x=>r.appendChild(x));
+    a.innerHTML='';if(later)a.appendChild(later);a.appendChild(r);a.classList.add('v148');a.setAttribute('role','group');
+    if(cands.length)a.classList.add('gq-pick');
+    return t.innerHTML}
+  const G=window.hwGQ,F=window.hwForceUI;
+  window.hwGQ=function(k,dv){return fix(G.apply(this,arguments),k,dv)};
+  window.hwForceUI=function(k,dv,date){return fix(F.apply(this,arguments),k,dv)};
+})();
 </script>
 </body></html>
